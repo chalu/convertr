@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="ALCDevToolkit">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Currency Converter</title>
+
+  <!--Import Google Icon Font-->
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+  <!--Import materialize.css-->
+  <link type="text/css" rel="stylesheet" media="screen,projection" href="node_modules/materialize-css/dist/css/materialize.min.css"
+  />
+
+  <link rel="stylesheet" href="statics/css/styles.css">
+
+</head>
+
+<body>
+
+  <div class="navbar-fixed">
+    <nav class="ghost">
+      <div class="nav-wrapper container">
+        <ul class="right">
+          <li>
+            <button id="offline" class="btn-floating grey darken-3">
+              <i class="material-icons">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="red">
+                  <path fill="none" d="M24 .01c0-.01 0-.01 0 0L0 0v24h24V.01zM0 0h24v24H0V0zm0 0h24v24H0V0z" />
+                  <path d="M22.99 9C19.15 5.16 13.8 3.76 8.84 4.78l2.52 2.52c3.47-.17 6.99 1.05 9.63 3.7l2-2zm-4 4c-1.29-1.29-2.84-2.13-4.49-2.56l3.53 3.53.96-.97zM2 3.05L5.07 6.1C3.6 6.82 2.22 7.78 1 9l1.99 2c1.24-1.24 2.67-2.16 4.2-2.77l2.24 2.24C7.81 10.89 6.27 11.73 5 13v.01L6.99 15c1.36-1.36 3.14-2.04 4.92-2.06L18.98 20l1.27-1.26L3.29 1.79 2 3.05zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0z"
+                  />
+                </svg>
+              </i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <main>
+    <div id="converter">
+      <div class="container">
+        <div class="row">
+          <div class="col s12">
+            <h2 class="teal-text title">Currency Converter</h2>
+          </div>
+        </div>
+
+        <div id="converter-wrap" class="row">
+          <div class="row converter-underlay layer switchable">
+          </div>
+          <div class="row converter-overlay layer switchable">
+            <div class="col s10 m10">
+              <div class="input-field omnibox-wrap">
+                <input type="text" id="omnibox" class="omnibox" />
+              </div>
+
+              <div class="row multibox-wrap">
+                <div class="input-field col s12 m3">
+                  <select id="src">
+                    <option selected>Source Currency</option>
+                  </select>
+                </div>
+
+                <div class="input-field col m1 hide-on-small-only">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                    <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+                    <path d="M0 0h24v24H0z" fill="none" />
+                  </svg>
+                </div>
+
+                <div class="input-field col s12 m6">
+                  <select id="dest" multiple>
+                    <option selected>Target Currencies</option>
+                  </select>
+                </div>
+
+                <div class="input-field col s2 m2">
+                  <button id="go-btn" class="btn-floating waves-effect waves-teal white">
+                    <i class="material-icons">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                        <path d="M0 0h24v24H0z" fill="none" />
+                        <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
+                      </svg>
+                    </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-field col s2 m2 switch-wrap">
+              <button id="mode-switch" class="btn-floating waves-effect waves-teal white">
+                <i class="material-icons">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"
+                    />
+                  </svg>
+                </i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <div id="converter-result-wrap" class="row">
+          <div class="col s12 m7 z-depth-2 white inner">
+            <p id="src-result" class="grey-text darken-2">
+            </p>
+            <div>
+              <i class="material-icons">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                  <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
+                  <path d="M0 0h24v24H0z" fill="none" />
+              </i>
+            </div>
+            <ul id="dest-result">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
+  <script src="node_modules/idb/lib/idb.js"></script>
+
+  <script type="module" src="src/index.js"></script>
+</body>
+
+</html>
