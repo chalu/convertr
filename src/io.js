@@ -7,7 +7,7 @@ const swUpdateReady = worker => {
   // });
   // toast.answer.then(function(answer) {
   //   if (answer != 'refresh') return;
-  //   worker.postMessage({action: 'skipWaiting'});
+  //   worker.postMessage({action: 'SkipWaiting'});
   // });
   return worker;
 };
@@ -63,34 +63,13 @@ const callConverterAPI = (
 };
 
 const loadCountries = () =>
-  // TODO check and load from DB first
-  // only call out if not in DB
-  // if (countries) return Promise.resolve({ results: countries });
-
   fetch('https://free.currencyconverterapi.com/api/v5/countries')
         .then(response => response.json())
         .catch(console.error);
 
-
 const runApp = () => {
   registerServiceWorker()
-    .then(worker => {
-      console.log('Done Registered SW', worker);
-      // dbGetCountries().then(c => {
-      //   console.log(c);
-      //   if (!c || c.length === 0) {
-      //     loadCountries().then(({ results: countries }) => {
-      //       console.log(countries);
-      //       dbSaveCountries(Object.values(countries));
-      //     });
-      //   }
-      // });
-      // loadCountries()
-      // .then(({ results: countries }) => {
-      //   getCountries = countriesFactory(countries);
-      //   console.log('gotten countries');
-      // })
-    })
+    .then(() => console.log('Registered Service Worker'))
     .catch(error => console.error(error));
 };
 

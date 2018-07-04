@@ -55,13 +55,15 @@
             <div class="col s10 m10">
               <div class="input-field omnibox-wrap">
                 <input type="text" id="omnibox" class="omnibox" />
+                <label for="omnibox"></label>
               </div>
 
               <div class="row multibox-wrap">
                 <div class="input-field col s12 m3">
                   <select id="src">
-                    <option selected>Source Currency</option>
+                    <option>Select One</option>
                   </select>
+                  <label for="src">Source Currency</label>
                 </div>
 
                 <div class="input-field col m1 hide-on-small-only">
@@ -73,8 +75,9 @@
 
                 <div class="input-field col s12 m6">
                   <select id="dest" multiple>
-                    <option selected>Target Currencies</option>
+                    <option>Select One or More</option>
                   </select>
+                  <label for="dest">Target Currencies</label>
                 </div>
 
                 <div class="input-field col s2 m2">
@@ -91,7 +94,7 @@
             </div>
 
             <div class="input-field col s2 m2 switch-wrap">
-              <button id="mode-switch" class="btn-floating waves-effect waves-teal white">
+              <!-- <button id="mode-switch" class="btn-floating waves-effect waves-teal white">
                 <i class="material-icons">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
                     <path d="M0 0h24v24H0z" fill="none" />
@@ -99,7 +102,7 @@
                     />
                   </svg>
                 </i>
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -110,11 +113,9 @@
             <p id="src-result" class="grey-text darken-2">
             </p>
             <div>
-              <i class="material-icons">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
-                  <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
-                  <path d="M0 0h24v24H0z" fill="none" />
-              </i>
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="#000000">
+                <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
+                <path d="M0 0h24v24H0z" fill="none" />
             </div>
             <ul id="dest-result">
             </ul>
@@ -124,10 +125,22 @@
     </div>
   </main>
 
+  <div class="preloader-wrapper big">
+    <div class="spinner-layer spinner-yellow-only">
+      <div class="circle-clipper left">
+        <div class="circle"></div>
+      </div><div class="gap-patch">
+        <div class="circle"></div>
+      </div><div class="circle-clipper right">
+        <div class="circle"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
-  <script src="node_modules/idb/lib/idb.js"></script>
 
   <script type="module" src="src/index.js"></script>
+  <!-- <script src="dist/main.js"></script> -->
 </body>
 
 </html>

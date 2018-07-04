@@ -1,14 +1,14 @@
 import {
+  rAF,
+  trim, split, 
   spaceDelimitter,
   queryCheckr,
   srcToDestCurrencyDelimitter
-} from './regexp.js';
+} from './utils.js';
 
 import { loadCountries, callConverterAPI } from './io.js';
-import { trim, split } from './fns.js';
 
-// TODO use rAF
-
+let pBar;
 let srcResultEl;
 let destResultEl;
 
@@ -84,6 +84,16 @@ const renderConversions = (conversions, currencies, amount = 1) => {
   });
 };
 
+const beginConverting = () => {
+  pBar = pBar || document.querySelector('.preloader-wrapper');
+  rAF().then(() => pBar.classList.add('active'));
+};
+
+const doneConverting = () => {
+  pBar = pBar || document.querySelector('.preloader-wrapper');
+  rAF().then(() => pBar.classList.remove('active'));
+};
+
 const handleAConversion = event => {
   const {
     keyCode,
@@ -109,6 +119,7 @@ const handleAConversion = event => {
     [amount, src] = unpackedFrom;
   }
 
+  beginConverting();
   Promise.all(callConverterAPI(src, dest))
     .then(calls =>
       calls
@@ -118,6 +129,7 @@ const handleAConversion = event => {
     .then(called => {
       Promise.all(called).then(conversions => {
         renderConversions(conversions, [src, ...dest], amount);
+        doneConverting();
       });
     });
 };

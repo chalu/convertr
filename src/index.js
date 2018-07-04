@@ -1,19 +1,20 @@
 import { runApp } from './io.js';
 import handleAConversion from './conversion.js';
 
-let documentBody;
-let switchables;
 
-const switchUI = () => {
-  switchables = switchables || document.querySelectorAll('.layer.switchable');
-  Array.from(switchables).forEach(layer => {
-    if (layer.classList.contains('expanded')) {
-      layer.classList.remove('expanded');
-    } else {
-      layer.classList.add('expanded');
-    }
-  });
-};
+let documentBody;
+// let switchables;
+
+// const switchUI = () => {
+//   switchables = switchables || document.querySelectorAll('.layer.switchable');
+//   Array.from(switchables).forEach(layer => {
+//     if (layer.classList.contains('expanded')) {
+//       layer.classList.remove('expanded');
+//     } else {
+//       layer.classList.add('expanded');
+//     }
+//   });
+// };
 
 const handleOnline = () => {
   documentBody = documentBody || document.querySelector('body');
@@ -40,7 +41,7 @@ const initConverter = () => {
     // calls to handleAConversion
     .addEventListener('keyup', handleAConversion);
 
-  document.querySelector('#mode-switch').addEventListener('click', switchUI);
+  // document.querySelector('#mode-switch').addEventListener('click', switchUI);
 
   document.querySelector('#offline').addEventListener('click', notifyOffline);
 

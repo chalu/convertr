@@ -1,6 +1,7 @@
 /* @media only screen and (min-width: 1535px) {} */
 
-html, body{
+html,
+body {
   height: 100%;
 }
 
@@ -17,7 +18,7 @@ body.offline {
 
 nav.ghost {
   background: transparent;
-  -webkit-box-shadow:none;
+  -webkit-box-shadow: none;
   box-shadow: none;
 }
 
@@ -35,7 +36,7 @@ nav.ghost {
 #offline {
   display: none;
   opacity: 0;
-  transition: opacity .9s ease-in-out;
+  transition: opacity 0.9s ease-in-out;
 }
 
 body.offline #offline {
@@ -44,15 +45,15 @@ body.offline #offline {
 }
 
 h2.title {
-  text-shadow: #FC0 1px 0 10px;
+  text-shadow: #fc0 1px 0 10px;
 }
 
-input[type=text].omnibox {
+input[type='text'].omnibox {
   font-size: 40px;
   border-bottom: 3px solid #26a69a;
 }
 
-input[type=text].omnibox:not(.browser-default):focus:not([readonly]) {
+input[type='text'].omnibox:not(.browser-default):focus:not([readonly]) {
   border-bottom: 2px solid #26a69a;
 }
 
@@ -69,13 +70,13 @@ input[type=text].omnibox:not(.browser-default):focus:not([readonly]) {
 .converter-underlay,
 .converter-overlay {
   min-height: 90px;
-  transition: min-height .3s ease-out;
+  transition: min-height 0.3s ease-out;
 }
 
 .converter-underlay {
   background: #fff;
   border-radius: 10px;
-  opacity: .8;
+  opacity: 0.8;
 }
 
 .converter-overlay {
@@ -92,12 +93,12 @@ input[type=text].omnibox:not(.browser-default):focus:not([readonly]) {
 .converter-overlay .switch-wrap button {
   position: absolute;
   bottom: auto;
-  transition: bottom  .6s ease-out;
+  transition: bottom 0.6s ease-out;
 }
 
 .converter-overlay .omnibox-wrap,
 .converter-overlay .multibox-wrap {
-  transition: opacity .8s;
+  transition: opacity 0.8s;
 }
 
 .converter-overlay .omnibox-wrap {
@@ -120,8 +121,9 @@ input[type=text].omnibox:not(.browser-default):focus:not([readonly]) {
   opacity: 1;
 }
 
-@media only screen and (max-width: 600px){
-  .converter-underlay.expanded, .converter-overlay.expanded {
+@media only screen and (max-width: 600px) {
+  .converter-underlay.expanded,
+  .converter-overlay.expanded {
     min-height: 175px;
   }
 
@@ -137,7 +139,7 @@ input[type=text].omnibox:not(.browser-default):focus:not([readonly]) {
 #converter-result-wrap {
   /* display: none; */
   opacity: 0;
-  transition: opacity .9s linear;
+  transition: opacity 0.9s linear;
 }
 
 #converter-result-wrap.has-results {
@@ -158,8 +160,22 @@ input[type=text].omnibox:not(.browser-default):focus:not([readonly]) {
   font-size: xx-large;
 }
 
-#src-result, #dest-result {
+#src-result,
+#dest-result {
   text-transform: capitalize;
   margin: 0.5em 0;
 }
 
+.preloader-wrapper {
+  position: absolute;
+  left: calc(50% - 24px);
+  top: calc(50% - 24px);
+  opacity: 0;
+  display: none;
+  transition: opacity 1.5s ease-in;
+}
+
+.preloader-wrapper.active {
+  display: block;
+  opacity: 1;
+}
