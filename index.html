@@ -5,15 +5,202 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="Description" content="A currency converter captonse project for Odili Charles' ALCwithGoogle Mobile Web Specialist course" />
+
+  <meta name="theme-color" content="#26a69a" />
+  <link rel="manifest" href="/manifest.json">
+
   <title>Currency Converter</title>
 
-  <!--Import Google Icon Font-->
-  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
   <!--Import materialize.css-->
   <link type="text/css" rel="stylesheet" media="screen,projection" href="node_modules/materialize-css/dist/css/materialize.min.css"
   />
 
-  <link rel="stylesheet" href="statics/css/styles.css">
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      background-image: url(./statics/images/optimized/didier-weemaels-36055-unsplash.jpg);
+      background-size: cover;
+      -webkit-transition: background-image 0.9s ease-in-out;
+      transition: background-image 0.9s ease-in-out;
+    }
+
+    body.offline {
+      background-image: url(./statics/images/didier-weemaels-36055-unsplash-grey.jpg);
+    }
+
+    nav.ghost {
+      background: transparent;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+    }
+
+    #offline,
+    #offline i {
+      position: relative;
+    }
+
+    #offline i svg {
+      position: absolute;
+      left: calc(50% - 12px);
+      top: calc(15%);
+    }
+
+    #offline {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.9s ease-in-out;
+    }
+
+    body.offline #offline {
+      display: block;
+      opacity: 1;
+    }
+
+    h2.title {
+      text-shadow: #fc0 1px 0 10px;
+    }
+
+    input[type='text'].omnibox {
+      font-size: 40px;
+      border-bottom: 3px solid #26a69a;
+    }
+
+    input[type='text'].omnibox:not(.browser-default):focus:not([readonly]) {
+      border-bottom: 2px solid #26a69a;
+    }
+
+    .multibox-wrap .input-field.dir {
+      padding-top: 1em;
+    }
+
+    .select-wrapper + label {
+      font-weight: bold;
+      font-size: large;
+    }
+
+    #converter-wrap {
+      padding-top: 20px;
+      position: relative;
+    }
+
+    .converter-underlay,
+    .converter-overlay {
+      min-height: 90px;
+      transition: min-height 0.3s ease-out;
+    }
+
+    .converter-underlay {
+      background: #fff;
+      border-radius: 10px;
+      opacity: 0.8;
+    }
+
+    .converter-overlay {
+      width: 100%;
+      position: absolute;
+      margin-top: -7.3em;
+    }
+
+    .converter-overlay .switch-wrap {
+      position: relative;
+      min-height: inherit;
+    }
+
+    .converter-overlay .switch-wrap button {
+      position: absolute;
+      bottom: auto;
+      transition: bottom 0.6s ease-out;
+    }
+
+    .converter-overlay .omnibox-wrap,
+    .converter-overlay .multibox-wrap {
+      transition: opacity 0.8s;
+    }
+
+    .converter-overlay .omnibox-wrap {
+      display: block;
+      opacity: 1;
+    }
+
+    .converter-overlay.expanded .omnibox-wrap {
+      display: none;
+      opacity: 0;
+    }
+
+    .converter-overlay .multibox-wrap {
+      display: none;
+      opacity: 0;
+    }
+
+    .converter-overlay.expanded .multibox-wrap {
+      display: block;
+      opacity: 1;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .converter-underlay.expanded,
+      .converter-overlay.expanded {
+        min-height: 175px;
+      }
+
+      .converter-overlay.expanded {
+        margin-top: -14em;
+      }
+
+      .converter-overlay.expanded .switch-wrap button {
+        bottom: 50px;
+      }
+    }
+
+    #converter-result-wrap {
+      /* display: none; */
+      opacity: 0;
+      transition: opacity 0.9s linear;
+    }
+
+    #converter-result-wrap.has-results {
+      /* display: block; */
+      opacity: 1;
+    }
+
+    #converter-result-wrap .inner {
+      opacity: 0.9;
+      border-radius: 10px;
+    }
+
+    #src-result {
+      font-size: x-large;
+    }
+
+    #dest-result {
+      font-size: xx-large;
+    }
+
+    #src-result,
+    #dest-result {
+      text-transform: capitalize;
+      margin: 0.5em 0;
+    }
+
+    .preloader-wrapper {
+      position: absolute;
+      left: calc(50% - 24px);
+      top: calc(50% - 24px);
+      opacity: 0;
+      display: none;
+      transition: opacity 1.5s ease-in;
+    }
+
+    .preloader-wrapper.active {
+      display: block;
+      opacity: 1;
+    }
+  </style>
 
 </head>
 
@@ -61,40 +248,27 @@
               <div class="row multibox-wrap">
                 <div class="input-field col s12 m3">
                   <select id="src">
-                    <option>Select One</option>
                   </select>
-                  <label for="src">Source Currency</label>
+                  <label for="src">From</label>
                 </div>
 
-                <div class="input-field col m1 hide-on-small-only">
+                <div class="input-field col m1 dir hide-on-small-only">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
                     <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
                     <path d="M0 0h24v24H0z" fill="none" />
                   </svg>
                 </div>
 
-                <div class="input-field col s12 m6">
+                <div class="input-field col s12 m7">
                   <select id="dest" multiple>
-                    <option>Select One or More</option>
                   </select>
-                  <label for="dest">Target Currencies</label>
-                </div>
-
-                <div class="input-field col s2 m2">
-                  <button id="go-btn" class="btn-floating waves-effect waves-teal white">
-                    <i class="material-icons">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
-                        <path d="M0 0h24v24H0z" fill="none" />
-                        <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
-                      </svg>
-                    </i>
-                  </button>
+                  <label for="dest">To</label>
                 </div>
               </div>
             </div>
 
             <div class="input-field col s2 m2 switch-wrap">
-              <!-- <button id="mode-switch" class="btn-floating waves-effect waves-teal white">
+              <button id="mode-switch" class="btn-floating waves-effect waves-teal white">
                 <i class="material-icons">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
                     <path d="M0 0h24v24H0z" fill="none" />
@@ -102,14 +276,14 @@
                     />
                   </svg>
                 </i>
-              </button> -->
+              </button>
             </div>
           </div>
         </div>
 
 
         <div id="converter-result-wrap" class="row">
-          <div class="col s12 m7 z-depth-2 white inner">
+          <div class="col s12 m12 l7 z-depth-2 white inner">
             <p id="src-result" class="grey-text darken-2">
             </p>
             <div>
@@ -129,9 +303,11 @@
     <div class="spinner-layer spinner-yellow-only">
       <div class="circle-clipper left">
         <div class="circle"></div>
-      </div><div class="gap-patch">
+      </div>
+      <div class="gap-patch">
         <div class="circle"></div>
-      </div><div class="circle-clipper right">
+      </div>
+      <div class="circle-clipper right">
         <div class="circle"></div>
       </div>
     </div>
@@ -139,8 +315,8 @@
 
   <script src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
 
-  <script type="module" src="src/index.js"></script>
-  <!-- <script src="dist/main.js"></script> -->
+  <!-- <script type="module" src="src/index.js"></script> -->
+  <script src="dist/main.js"></script>
 </body>
 
 </html>

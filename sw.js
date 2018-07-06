@@ -1,8 +1,9 @@
 importScripts('./node_modules/idb/lib/idb.js');
 
 const appPrefix = 'convertr-';
-const staticCacheName = `${appPrefix}static-v7`;
+const staticCacheName = `${appPrefix}static-v8`;
 const allCaches = [staticCacheName];
+const logstyle = 'background:#26a69a; color: #fff; display: block;';
 
 // IndexedDB onperations
 // open/get connection to database
@@ -66,11 +67,10 @@ self.addEventListener('install', event => {
       return cache.addAll([
         '/',
         'src/index.js',
-        'statics/css/styles.css',
         'statics/images/icon.png',
         'node_modules/idb/lib/idb.js',
-        'statics/images/didier-weemaels-36055-unsplash.jpg',
-        'statics/images/didier-weemaels-36055-unsplash-grey.jpg',
+        'statics/images/optimized/didier-weemaels-36055-unsplash.jpg',
+        'statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg',
         'node_modules/materialize-css/dist/css/materialize.min.css',
         'node_modules/materialize-css/dist/js/materialize.min.js',
         'https://fonts.gstatic.com/s/roboto/v15/2UX7WLTfW3W8TclTUvlFyQ.woff',
@@ -126,13 +126,15 @@ self.addEventListener('fetch', event => {
 // respond to user with cached data
 const generateAResponse = data => {
   return new Response(JSON.stringify(data), {
+    status: 200,
+    statusText: 'OK',
     headers: {
-      'content-type': 'application/json'
+      'Content-Type': 'application/json'
     }
   });
 };
 
-// given a timestamp, generate 
+// given a timestamp, generate
 // today's date as string, formatted as
 // 7-2-2018 for July 2nd 2018
 const unbundleDateForKey = timestamp => {
@@ -142,9 +144,9 @@ const unbundleDateForKey = timestamp => {
 
 // outbound call for currency conversion
 // save the results in the cache for
-// calls for this exact currency combination, 
+// calls for this exact currency combination,
 // anytime within a day
-const fetchAndSaveConversion = (request) => {
+const fetchAndSaveConversion = request => {
   return fetch(request).then(networkResponse => {
     const clone = networkResponse.clone();
     if (clone.status === 200) {
@@ -168,13 +170,9 @@ const fetchAndSaveConversion = (request) => {
   });
 };
 
-// get currency conversions cached today, 
+// get currency conversions cached today,
 // matching what the user is now interested in
-const getCachedConversionQueries = ({
-  qryParts,
-  conversions,
-  dateKeyPart
-}) => {
+const getCachedConversionQueries = ({ qryParts, conversions, dateKeyPart }) => {
   return qryParts.reduce((pool, q) => {
     const found = conversions.find(({ key }) => key === `${q}-${dateKeyPart}`);
     if (found !== undefined) {
@@ -190,18 +188,18 @@ const getCachedConversionQueries = ({
 // for the first time
 const fetchSaveAndMergeConversion = (url, cached) => {
   return fetchAndSaveConversion(url)
-  .then(response => response.json())
-  .then((data = {}) => {
-    Object.keys(data).forEach(key => {
-      cached[key] = data[key];
+    .then(response => response.json())
+    .then((data = {}) => {
+      Object.keys(data).forEach(key => {
+        cached[key] = data[key];
+      });
+      return generateAResponse(cached);
     });
-    return generateAResponse(cached);
-  });
 };
 
-// handle an API call to convert two 
+// handle an API call to convert two
 // or more currencies
-const serveConversion = ({request}, query) => {
+const serveConversion = ({ request }, query) => {
   const qry = query.substring(query.indexOf('q=') + 2, query.indexOf('&'));
   const qryParts = qry.split(',');
 
@@ -210,6 +208,11 @@ const serveConversion = ({request}, query) => {
   return dbGetConversions().then(conversions => {
     console.log(conversions);
     if (!conversions || conversions.length === 0) {
+      console.log(
+        '%c Convertr SW %c ->',
+        logstyle, '',
+        'using network for debut conversion(s)'
+      );
       return fetchAndSaveConversion(request);
     }
 
@@ -229,6 +232,12 @@ const serveConversion = ({request}, query) => {
       // 1. is the entire request cached?
       // if so, respond right away with cached data
       if (cachedQrysKeys.length === qryParts.length) {
+        console.log(
+          '%c Convertr SW %c ->',
+          logstyle, '',
+          'using cache for',
+          cachedQrysKeys.join(', ')
+        );
         return generateAResponse(cachedQrys);
       }
 
@@ -242,22 +251,25 @@ const serveConversion = ({request}, query) => {
         const url = request.url.replace(qry, leftOvers.join(','));
         console.log(url);
         let resp = fetchSaveAndMergeConversion(url, cachedQrys);
+        console.log(resp);
         return resp;
       }
-    } 
+    }
 
-    // user is trying a new conversion today
-    console.log('user is trying a new conversion today');
+    console.log(
+      '%c Convertr SW %c ->',
+      logstyle, '',
+      '... trying a new conversion today'
+    );
     return fetchAndSaveConversion(request);
-
   });
 };
 
 // outbound call for countries data
 // this should happen once for the
-// life time of this application, 
-// TODO : unless there's a DB upgrade 
-const fetchAndSaveCountries = (request) => {
+// life time of this application,
+// TODO : unless there's a DB upgrade
+const fetchAndSaveCountries = request => {
   return fetch(request).then(networkResponse => {
     const clone = networkResponse.clone();
     if (clone.status === 200) {
@@ -270,10 +282,11 @@ const fetchAndSaveCountries = (request) => {
 };
 
 // handle API call to fetch countries data
-const serveCountries = ({request}) => {
+const serveCountries = ({ request }) => {
   return dbGetCountries().then(countries => {
     if (!countries || countries.length === 0) {
-      console.log('fetching countries ...');
+      console.log('%c Convertr SW %c ->',
+      logstyle, '', 'fetching countries');
       return fetchAndSaveCountries(request);
     }
 
@@ -282,13 +295,13 @@ const serveCountries = ({request}) => {
       return pool;
     }, {});
 
-    console.log('using countries from cache');
+    console.log('%c Convertr SW %c ->', logstyle, '', 'using countries from cache');
     return generateAResponse({ results: mapped });
   });
 };
 
 // handle commands from the UI
-self.addEventListener('message', ({data}) => {
+self.addEventListener('message', ({ data }) => {
   const { action } = data;
   if (action === 'SkipWaiting') {
     self.skipWaiting();

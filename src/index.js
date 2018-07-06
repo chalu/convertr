@@ -3,22 +3,23 @@ import handleAConversion from './conversion.js';
 
 
 let documentBody;
-// let switchables;
+let switchables;
 
-// const switchUI = () => {
-//   switchables = switchables || document.querySelectorAll('.layer.switchable');
-//   Array.from(switchables).forEach(layer => {
-//     if (layer.classList.contains('expanded')) {
-//       layer.classList.remove('expanded');
-//     } else {
-//       layer.classList.add('expanded');
-//     }
-//   });
-// };
+const switchUI = () => {
+  switchables = switchables || document.querySelectorAll('.layer.switchable');
+  Array.from(switchables).forEach(layer => {
+    if (layer.classList.contains('expanded')) {
+      layer.classList.remove('expanded');
+    } else {
+      layer.classList.add('expanded');
+    }
+  });
+};
 
 const handleOnline = () => {
   documentBody = documentBody || document.querySelector('body');
   documentBody.classList.remove('offline');
+  M.toast({ html: 'your connetion has been restored!' });
 };
 
 const notifyOffline = () => {
@@ -41,7 +42,7 @@ const initConverter = () => {
     // calls to handleAConversion
     .addEventListener('keyup', handleAConversion);
 
-  // document.querySelector('#mode-switch').addEventListener('click', switchUI);
+  document.querySelector('#mode-switch').addEventListener('click', switchUI);
 
   document.querySelector('#offline').addEventListener('click', notifyOffline);
 
