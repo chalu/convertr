@@ -1,7 +1,4 @@
 module.exports = {
-  devServer: {
-    contentBase: './'
-  },
   module: {
     rules: [
       {
