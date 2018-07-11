@@ -1,1 +1,1 @@
-## A currency converter captonse project for my ALCwithGoogle course and engagement
+## A currency converter capstone project for my ALCwithGoogle course and engagement
