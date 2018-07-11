@@ -1,0 +1,18 @@
+{
+  "scope": "/",
+  "start_url": ".",
+  "name": "Convert",
+  "short_name": "Convert",
+  "display": "standalone",
+  "theme_color": "#26a69a",
+  "background_color": "#fff",
+  "icons": [{
+    "src": "statics/images/icon.png",
+    "sizes": "195x195",
+    "type": "image/png"
+  }, {
+    "src": "statics/images/splash.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }]
+}

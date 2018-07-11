@@ -1,0 +1,12 @@
+{
+    "extends": ["airbnb-base", "prettier"],
+    "rules": {
+      "comma-dangle": ["error", "never"],
+      "import/extensions": ["error", "ignorePackages"]
+    },
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  }
+  
