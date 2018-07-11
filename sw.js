@@ -66,7 +66,7 @@ self.addEventListener('install', event => {
     caches.open(staticCacheName).then(cache => {
       return cache.addAll([
         '/',
-        'src/index.js',
+        'dist/main.js',
         'statics/images/icon.png',
         'node_modules/idb/lib/idb.js',
         'statics/images/optimized/didier-weemaels-36055-unsplash.jpg',
@@ -117,9 +117,9 @@ self.addEventListener('fetch', event => {
 
   // load static assets from cache
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-    })
+    caches
+      .match(event.request)
+      .then(response => response || fetch(event.request))
   );
 });
 
@@ -210,7 +210,8 @@ const serveConversion = ({ request }, query) => {
     if (!conversions || conversions.length === 0) {
       console.log(
         '%c Convertr SW %c ->',
-        logstyle, '',
+        logstyle,
+        '',
         'using network for debut conversion(s)'
       );
       return fetchAndSaveConversion(request);
@@ -234,7 +235,8 @@ const serveConversion = ({ request }, query) => {
       if (cachedQrysKeys.length === qryParts.length) {
         console.log(
           '%c Convertr SW %c ->',
-          logstyle, '',
+          logstyle,
+          '',
           'using cache for',
           cachedQrysKeys.join(', ')
         );
@@ -258,7 +260,8 @@ const serveConversion = ({ request }, query) => {
 
     console.log(
       '%c Convertr SW %c ->',
-      logstyle, '',
+      logstyle,
+      '',
       '... trying a new conversion today'
     );
     return fetchAndSaveConversion(request);
@@ -285,8 +288,7 @@ const fetchAndSaveCountries = request => {
 const serveCountries = ({ request }) => {
   return dbGetCountries().then(countries => {
     if (!countries || countries.length === 0) {
-      console.log('%c Convertr SW %c ->',
-      logstyle, '', 'fetching countries');
+      console.log('%c Convertr SW %c ->', logstyle, '', 'fetching countries');
       return fetchAndSaveCountries(request);
     }
 
@@ -295,7 +297,12 @@ const serveCountries = ({ request }) => {
       return pool;
     }, {});
 
-    console.log('%c Convertr SW %c ->', logstyle, '', 'using countries from cache');
+    console.log(
+      '%c Convertr SW %c ->',
+      logstyle,
+      '',
+      'using countries from cache'
+    );
     return generateAResponse({ results: mapped });
   });
 };

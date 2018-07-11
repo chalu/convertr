@@ -1,9 +1,9 @@
 import { runApp } from './io.js';
 import handleAConversion from './conversion.js';
 
-
 let documentBody;
 let switchables;
+let wasJustOffline = false;
 
 const switchUI = () => {
   switchables = switchables || document.querySelectorAll('.layer.switchable');
@@ -19,7 +19,10 @@ const switchUI = () => {
 const handleOnline = () => {
   documentBody = documentBody || document.querySelector('body');
   documentBody.classList.remove('offline');
-  M.toast({ html: 'your connetion has been restored!' });
+  if(wasJustOffline === true) {
+    M.toast({ html: 'your connetion has been restored!' });
+    wasJustOffline = false;
+  }
 };
 
 const notifyOffline = () => {
@@ -29,6 +32,7 @@ const notifyOffline = () => {
 const handleOffline = () => {
   documentBody = documentBody || document.querySelector('body');
   documentBody.classList.add('offline');
+  wasJustOffline = true;
   notifyOffline();
 };
 

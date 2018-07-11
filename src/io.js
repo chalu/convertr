@@ -1,14 +1,8 @@
 const apiBase = 'https://free.currencyconverterapi.com/api/v5/convert';
 
 const swUpdateReady = worker => {
+  M.toast({ html: 'Updating to the latest and greatest version ...' });
   worker.postMessage({ action: 'skipWaiting' });
-  // var toast = this._toastsView.show("New version available", {
-  //   buttons: ['refresh', 'dismiss']
-  // });
-  // toast.answer.then(function(answer) {
-  //   if (answer != 'refresh') return;
-  //   worker.postMessage({action: 'SkipWaiting'});
-  // });
   return worker;
 };
 
@@ -26,8 +20,6 @@ const registerServiceWorker = () =>
     if (!navigator.serviceWorker) resolve();
 
     navigator.serviceWorker.register('/sw.js').then(reg => {
-      // if (!navigator.serviceWorker.controller) return;
-
       if (reg.waiting) {
         resolve(swUpdateReady(reg.waiting));
         return;
