@@ -3,6 +3,7 @@ importScripts('./node_modules/idb/lib/idb.js');
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
+const URIPrefix = '/convertr';
 
 // some utils
 const log = (...msgs) => {
@@ -84,18 +85,16 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(staticCacheName).then(cache => {
       return cache.addAll([
-        '/',
-        './index.html',
-        './dist/main.js',
-        './src/index.js',
-        './statics/images/icon.png',
-        './node_modules/idb/lib/idb.js',
-        './statics/images/optimized/didier-weemaels-36055-unsplash.jpg',
-        './statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg',
-        './node_modules/materialize-css/dist/css/materialize.min.css',
-        './node_modules/materialize-css/dist/js/materialize.min.js'
-        // 'https://fonts.gstatic.com/s/roboto/v15/2UX7WLTfW3W8TclTUvlFyQ.woff',
-        // 'https://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOD8E0i7KZn-EPnyo3HZu7kw.woff'
+        `${URIPrefix}/`,
+        `${URIPrefix}/index.html`,
+        `${URIPrefix}/dist/main.js`,
+        `${URIPrefix}/src/index.js`,
+        `${URIPrefix}/statics/images/icon.png`,
+        `${URIPrefix}/node_modules/idb/lib/idb.js`,
+        `${URIPrefix}/statics/images/optimized/didier-weemaels-36055-unsplash.jpg`,
+        `${URIPrefix}/statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg`,
+        `${URIPrefix}/node_modules/materialize-css/dist/css/materialize.min.css`,
+        `${URIPrefix}/node_modules/materialize-css/dist/js/materialize.min.js`
       ]);
     })
   );
