@@ -1,8 +1,10 @@
 import {
   rAF,
-  trim, split, 
+  trim,
+  split,
   spaceDelimitter,
   queryCheckr,
+  logger,
   srcToDestCurrencyDelimitter
 } from './utils.js';
 
@@ -11,6 +13,8 @@ import { loadCountries, callConverterAPI } from './io.js';
 let pBar;
 let srcResultEl;
 let destResultEl;
+
+const log = logger('App');
 
 const unbundleConversion = conversion => {
   const keys = Object.keys(conversion);
@@ -37,13 +41,12 @@ const renderAConversion = (conversion, index, countries, amount) => {
   });
 };
 
-const renderForTheseCountries = (countries, amount) => (conversion, index) => {
+const renderForTheseCountries = (countries, amount) => (conversion, index) =>
   renderAConversion(conversion, index, countries, amount);
-};
 
 const optimizeQueryingWith = (currencies, amount) =>
   loadCountries()
-    .then(({ results: countries }) =>
+    .then(({ results: countries } = {}) =>
       currencies.reduce((countriesMapping, currency) => {
         const found = Object.values(countries).find(
           ({ currencyId, currencyName }) => {
@@ -120,14 +123,18 @@ const handleAConversion = event => {
   }
 
   beginConverting();
+  // TODO
+  // Are we making these API calls
+  // in parallel or in sequence?
+  // Better if they are in parallel
   Promise.all(callConverterAPI(src, dest))
-    .then(calls =>
-      calls
-        .filter(({ status }) => status === 200)
-        .map(response => response.json())
-    )
-    .then(called => {
-      Promise.all(called).then(conversions => {
+    .then(responses => {
+      return responses
+        .filter(response => response && response.status === 200)
+        .map(response => response.json());
+    })
+    .then(successfulResponses => {
+      Promise.all(successfulResponses).then(conversions => {
         renderConversions(conversions, [src, ...dest], amount);
         doneConverting();
       });

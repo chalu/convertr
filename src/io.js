@@ -1,3 +1,6 @@
+import { logger } from './utils.js';
+
+const { info, err } = logger('App');
 const apiBase = 'https://free.currencyconverterapi.com/api/v5/convert';
 
 const swUpdateReady = worker => {
@@ -19,23 +22,21 @@ const registerServiceWorker = () =>
   new Promise(resolve => {
     if (!navigator.serviceWorker) resolve();
 
-    navigator.serviceWorker
-      .register('/convertr/sw.js', { scope: '/convertr/' })
-      .then(reg => {
-        if (reg.waiting) {
-          resolve(swUpdateReady(reg.waiting));
-          return;
-        }
+    navigator.serviceWorker.register('sw.js', { scope: '/' }).then(reg => {
+      if (reg.waiting) {
+        resolve(swUpdateReady(reg.waiting));
+        return;
+      }
 
-        if (reg.installing) {
-          resolve(trackSwInstallation(reg.installing));
-          return;
-        }
+      if (reg.installing) {
+        resolve(trackSwInstallation(reg.installing));
+        return;
+      }
 
-        reg.addEventListener('updatefound', () =>
-          trackSwInstallation(reg.installing)
-        );
-      });
+      reg.addEventListener('updatefound', () =>
+        trackSwInstallation(reg.installing)
+      );
+    });
   });
 
 const callConverterAPI = (
@@ -43,28 +44,34 @@ const callConverterAPI = (
   [firstTo, secondTo, ...moreTos],
   calls = []
 ) => {
-  if (firstTo === undefined) return calls;
+  if (!firstTo) return calls;
 
-  if (secondTo === undefined) {
-    calls.push(fetch(`${apiBase}?q=${from}_${firstTo}&compact=ultra`));
-    return calls;
+  if (firstTo && !secondTo) {
+    return [
+      ...calls,
+      fetch(`${apiBase}?q=${from}_${firstTo}&compact=ultra`)
+    ];
   }
 
-  calls.push(
-    fetch(`${apiBase}?q=${from}_${firstTo},${from}_${secondTo}&compact=ultra`)
-  );
+  calls = [
+    ...calls,
+    fetch(
+      `${apiBase}?q=${from}_${firstTo},${from}_${secondTo}&compact=ultra`
+    )
+  ];
+
   return callConverterAPI(from, moreTos, calls);
 };
 
 const loadCountries = () =>
   fetch('https://free.currencyconverterapi.com/api/v5/countries')
     .then(response => response.json())
-    .catch(console.error);
+    .catch(error => err(error));
 
 const runApp = () => {
   registerServiceWorker()
-    .then(() => console.log('Registered Service Worker'))
-    .catch(error => console.error(error));
+    .then(() => info('Registered Service Worker'))
+    .catch(error => err(error));
 };
 
 export { callConverterAPI, loadCountries, runApp };

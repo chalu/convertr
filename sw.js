@@ -3,84 +3,107 @@ importScripts('./node_modules/idb/lib/idb.js');
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
-const logstyle = 'background:#26a69a; color: #fff; display: block;';
 
-// IndexedDB onperations
+// some utils
+const log = (...msgs) => {
+  console.log(
+    `%c Convertr SW %c ->`,
+    'background:#26a69a;color:#fff;display:block;',
+    '',
+    ...msgs
+  );
+};
+
+const responseCanErr = response => {
+  if (!response.ok) throw Error(response.status);
+  return response;
+};
+
+/* IndexedDB onperations
+*************************** */
+
+// object store names
+const COUNTRIES = 'countries';
+const CONVERSIONS = 'conversions';
+
 // open/get connection to database
 const getDB = () =>
   idb.open('convertr', 1, upgradeDb => {
-    const countriesStore = upgradeDb.createObjectStore('countries', {
+    const countriesStore = upgradeDb.createObjectStore(COUNTRIES, {
       keyPath: 'id'
     });
     countriesStore.createIndex('by-abbrv', 'alpha3');
 
-    const conversionsStore = upgradeDb.createObjectStore('conversions', {
-      keyPath: 'date'
+    const conversionsStore = upgradeDb.createObjectStore(CONVERSIONS, {
+      keyPath: 'key'
     });
     conversionsStore.createIndex('by-date', 'date');
   });
 
-// get Countries data from DB
+const dbSaveCollection = (collection, store, db) =>
+  collection.reduce((prevTnx, entry) => {
+    const tnx = db.transaction(store, 'readwrite');
+    tnx.objectStore(store).add(entry);
+
+    return prevTnx.then(() => tnx.complete);
+  }, Promise.resolve());
+
+// get countries data from DB
 const dbGetCountries = () =>
   getDB().then(db =>
     db
-      .transaction('countries')
-      .objectStore('countries')
+      .transaction(COUNTRIES)
+      .objectStore(COUNTRIES)
       .index('by-abbrv')
       .getAll()
   );
 
-// save Countries data to DB
-const dbSaveCountries = data =>
-  getDB().then(db => {
-    const tnx = db.transaction('countries', 'readwrite');
-    const store = tnx.objectStore('countries');
-    data.forEach(country => {
-      store.put(country);
-    });
-    return tnx.complete;
-  });
+// save countries data to DB
+const dbSaveCountries = countries =>
+  getDB().then(db => dbSaveCollection(countries, COUNTRIES, db));
 
 // get currency conversions data from DB
 const dbGetConversions = () => {
   return getDB().then(db => {
     return db
-      .transaction('conversions')
-      .objectStore('conversions')
+      .transaction(CONVERSIONS)
+      .objectStore(CONVERSIONS)
       .index('by-date')
       .getAll();
   });
 };
 
-// save currency conversions data for today to DB
+/* End IndexedDB onperations
+****************************** */
+
+// save currency conversions to DB
 const dbSaveConversions = conversions =>
-  getDB().then(db => {
-    const tnx = db.transaction('conversions', 'readwrite');
-    const store = tnx.objectStore('conversions');
-    conversions.forEach(conversion => store.put(conversion));
-    return tnx.complete;
-  });
+  getDB().then(db => dbSaveCollection(conversions, CONVERSIONS, db));
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(staticCacheName).then(cache => {
       return cache.addAll([
-        '/convertr/',
-        '/convertr/dist/main.js',
-        '/convertr/statics/images/icon.png',
-        '/convertr/node_modules/idb/lib/idb.js',
-        '/convertr/statics/images/optimized/didier-weemaels-36055-unsplash.jpg',
-        '/convertr/statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg',
-        '/convertr/node_modules/materialize-css/dist/css/materialize.min.css',
-        '/convertr/node_modules/materialize-css/dist/js/materialize.min.js',
-        'https://fonts.gstatic.com/s/roboto/v15/2UX7WLTfW3W8TclTUvlFyQ.woff',
-        'https://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOD8E0i7KZn-EPnyo3HZu7kw.woff'
+        '/',
+        './index.html',
+        './dist/main.js',
+        './src/index.js',
+        './statics/images/icon.png',
+        './node_modules/idb/lib/idb.js',
+        './statics/images/optimized/didier-weemaels-36055-unsplash.jpg',
+        './statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg',
+        './node_modules/materialize-css/dist/css/materialize.min.css',
+        './node_modules/materialize-css/dist/js/materialize.min.js'
+        // 'https://fonts.gstatic.com/s/roboto/v15/2UX7WLTfW3W8TclTUvlFyQ.woff',
+        // 'https://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOD8E0i7KZn-EPnyo3HZu7kw.woff'
       ]);
     })
   );
 });
 
 // TODO delete conversions in DB older then 1 week
+// OR make this a default setting that the user can alter
+// with a settings UI
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
@@ -88,7 +111,7 @@ self.addEventListener('activate', event => {
         cacheNames
           .filter(function(cacheName) {
             return (
-              cacheName.startsWith('appPrefix') &&
+              cacheName.startsWith(`${appPrefix}`) &&
               !allCaches.includes(cacheName)
             );
           })
@@ -116,6 +139,8 @@ self.addEventListener('fetch', event => {
   }
 
   // load static assets from cache
+  // if they exisit or consult the network
+  // TODO how does the second call to fetch slow things down?
   event.respondWith(
     caches
       .match(event.request)
@@ -145,14 +170,18 @@ const unbundleDateForKey = timestamp => {
 // outbound call for currency conversion
 // save the results in the cache for
 // calls for this exact currency combination,
-// anytime within a day
+// anytime within same day
 const fetchAndSaveConversion = request => {
-  return fetch(request).then(networkResponse => {
-    const clone = networkResponse.clone();
-    if (clone.status === 200) {
+  return fetch(request)
+    .then(responseCanErr)
+    .then(networkResponse => {
+      const clone = networkResponse.clone();
+      // TODO make this flow asynchronous
+      // let net wait to complete the DB operation before
+      // responding for this request
       clone.json().then(data => {
         const now = Date.now();
-        const conversions = Object.keys(data).reduce(
+        const formattedConversions = Object.keys(data).reduce(
           (conversions, keyCombo) => {
             conversions.push({
               date: now,
@@ -163,11 +192,13 @@ const fetchAndSaveConversion = request => {
           },
           []
         );
-        dbSaveConversions(conversions);
+        dbSaveConversions(formattedConversions);
       });
-    }
-    return networkResponse;
-  });
+      return networkResponse;
+    })
+    .catch(error => {
+      log(`Error fetching ${request.url}`, error.message);
+    });
 };
 
 // get currency conversions cached today,
@@ -203,17 +234,12 @@ const serveConversion = ({ request }, query) => {
   const qry = query.substring(query.indexOf('q=') + 2, query.indexOf('&'));
   const qryParts = qry.split(',');
 
-  console.log(qryParts);
+  log(qryParts);
   const dateKeyPart = unbundleDateForKey(Date.now());
   return dbGetConversions().then(conversions => {
-    console.log(conversions);
+    log(conversions);
     if (!conversions || conversions.length === 0) {
-      console.log(
-        '%c Convertr SW %c ->',
-        logstyle,
-        '',
-        'using network for debut conversion(s)'
-      );
+      log('using network for debut conversion(s)');
       return fetchAndSaveConversion(request);
     }
 
@@ -223,23 +249,17 @@ const serveConversion = ({ request }, query) => {
       dateKeyPart
     });
 
-    console.log(cachedQrys);
+    log(cachedQrys);
     let leftOvers;
     const cachedQrysKeys = Object.keys(cachedQrys);
-    console.log(cachedQrysKeys);
+    log(cachedQrysKeys);
     if (cachedQrysKeys.length >= 1) {
       // user already made request for this conversion today
 
       // 1. is the entire request cached?
       // if so, respond right away with cached data
       if (cachedQrysKeys.length === qryParts.length) {
-        console.log(
-          '%c Convertr SW %c ->',
-          logstyle,
-          '',
-          'using cache for',
-          cachedQrysKeys.join(', ')
-        );
+        log('using cache for', cachedQrysKeys.join(', '));
         return generateAResponse(cachedQrys);
       }
 
@@ -249,21 +269,13 @@ const serveConversion = ({ request }, query) => {
       // before responding to user
       if (cachedQrysKeys.length !== qryParts.length) {
         leftOvers = qryParts.filter(q => !cachedQrysKeys.includes(q));
-        console.log(leftOvers);
+        log(leftOvers);
         const url = request.url.replace(qry, leftOvers.join(','));
-        console.log(url);
-        let resp = fetchSaveAndMergeConversion(url, cachedQrys);
-        console.log(resp);
-        return resp;
+        return fetchSaveAndMergeConversion(url, cachedQrys);
       }
     }
 
-    console.log(
-      '%c Convertr SW %c ->',
-      logstyle,
-      '',
-      '... trying a new conversion today'
-    );
+    log('... requesting a new conversion today');
     return fetchAndSaveConversion(request);
   });
 };
@@ -288,22 +300,17 @@ const fetchAndSaveCountries = request => {
 const serveCountries = ({ request }) => {
   return dbGetCountries().then(countries => {
     if (!countries || countries.length === 0) {
-      console.log('%c Convertr SW %c ->', logstyle, '', 'fetching countries');
+      log('fetching countries');
       return fetchAndSaveCountries(request);
     }
 
-    const mapped = countries.reduce((pool, country) => {
+    const formattedCountries = countries.reduce((pool, country) => {
       pool[country.id] = country;
       return pool;
     }, {});
 
-    console.log(
-      '%c Convertr SW %c ->',
-      logstyle,
-      '',
-      'using countries from cache'
-    );
-    return generateAResponse({ results: mapped });
+    log('using countries from cache');
+    return generateAResponse({ results: formattedCountries });
   });
 };
 

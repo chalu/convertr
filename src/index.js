@@ -20,12 +20,14 @@ const handleOnline = () => {
   documentBody = documentBody || document.querySelector('body');
   documentBody.classList.remove('offline');
   if(wasJustOffline === true) {
+    M.Toast.dismissAll();
     M.toast({ html: 'your connetion has been restored!' });
     wasJustOffline = false;
   }
 };
 
 const notifyOffline = () => {
+  M.Toast.dismissAll();
   M.toast({ html: 'you no longer have connetion!' });
 };
 
