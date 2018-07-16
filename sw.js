@@ -3,7 +3,7 @@ importScripts('./node_modules/idb/lib/idb.js');
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
-const URIPrefix = '/convertr';
+const URIPrefix = '.';
 
 // some utils
 const log = (...msgs) => {
@@ -89,7 +89,6 @@ self.addEventListener('install', event => {
         `${URIPrefix}/index.html`,
         `${URIPrefix}/dist/main.js`,
         `${URIPrefix}/src/index.js`,
-        `${URIPrefix}/statics/images/icon.png`,
         `${URIPrefix}/node_modules/idb/lib/idb.js`,
         `${URIPrefix}/statics/images/optimized/didier-weemaels-36055-unsplash.jpg`,
         `${URIPrefix}/statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg`,
@@ -158,6 +157,36 @@ const generateAResponse = data => {
   });
 };
 
+const getQueryParts = search => {
+  const query = search.substring(search.indexOf('q=') + 2, search.indexOf('&'));
+  const parts = query.split(',');
+  return { query, parts };
+};
+
+const queueConversionRequest = (parts) => {
+  log('queueConversionRequest', parts, self);
+};
+
+const respondFromHistoryOrDefaultToZeroThenQueue = ({url}) => {
+  const search = new URL(url).search;
+  const { parts } = getQueryParts(search);
+  return dbGetConversions().then(conversions => {
+    const unwiseConversions = parts.reduce((pool, part) => {
+      let found = conversions.find(cvn => cvn.key.startsWith(part));
+      if(found) {
+        pool[part] = found[part];
+      } else {
+        pool[part] = 0;
+      }
+      return pool;
+    }, {isUnwise: true});
+
+    // TODO queue a request for the conversion 
+    queueConversionRequest(parts);
+    return generateAResponse(unwiseConversions);
+  });
+};
+
 // given a timestamp, generate
 // today's date as string, formatted as
 // 7-2-2018 for July 2nd 2018
@@ -180,6 +209,7 @@ const fetchAndSaveConversion = request => {
       // responding for this request
       clone.json().then(data => {
         const now = Date.now();
+        // const now = 1531447229620;
         const formattedConversions = Object.keys(data).reduce(
           (conversions, keyCombo) => {
             conversions.push({
@@ -197,14 +227,15 @@ const fetchAndSaveConversion = request => {
     })
     .catch(error => {
       log(`Error fetching ${request.url}`, error.message);
+      return respondFromHistoryOrDefaultToZeroThenQueue(request);
     });
 };
 
 // get currency conversions cached today,
 // matching what the user is now interested in
-const getCachedConversionQueries = ({ qryParts, conversions, dateKeyPart }) => {
-  return qryParts.reduce((pool, q) => {
-    const found = conversions.find(({ key }) => key === `${q}-${dateKeyPart}`);
+const getCachedConversionQueries = ({ parts, conversions, dateKey }) => {
+  return parts.reduce((pool, q) => {
+    const found = conversions.find(({ key }) => key === `${q}-${dateKey}`);
     if (found !== undefined) {
       pool[q] = found[q];
     }
@@ -229,35 +260,32 @@ const fetchSaveAndMergeConversion = (url, cached) => {
 
 // handle an API call to convert two
 // or more currencies
-const serveConversion = ({ request }, query) => {
-  const qry = query.substring(query.indexOf('q=') + 2, query.indexOf('&'));
-  const qryParts = qry.split(',');
+const serveConversion = ({ request }, search) => {
+  const { query, parts } = getQueryParts(search);
 
-  log(qryParts);
-  const dateKeyPart = unbundleDateForKey(Date.now());
+  const dateKey = unbundleDateForKey(Date.now());
   return dbGetConversions().then(conversions => {
-    log(conversions);
     if (!conversions || conversions.length === 0) {
       log('using network for debut conversion(s)');
       return fetchAndSaveConversion(request);
     }
 
+    log(query, parts);
     const cachedQrys = getCachedConversionQueries({
-      qryParts,
+      parts,
       conversions,
-      dateKeyPart
+      dateKey
     });
 
-    log(cachedQrys);
     let leftOvers;
+    log('cachedQrys', cachedQrys);
     const cachedQrysKeys = Object.keys(cachedQrys);
-    log(cachedQrysKeys);
     if (cachedQrysKeys.length >= 1) {
       // user already made request for this conversion today
 
       // 1. is the entire request cached?
       // if so, respond right away with cached data
-      if (cachedQrysKeys.length === qryParts.length) {
+      if (cachedQrysKeys.length === parts.length) {
         log('using cache for', cachedQrysKeys.join(', '));
         return generateAResponse(cachedQrys);
       }
@@ -266,10 +294,9 @@ const serveConversion = ({ request }, query) => {
       // if so, fetch the uncached part, then merge
       // the final results with data from cache
       // before responding to user
-      if (cachedQrysKeys.length !== qryParts.length) {
-        leftOvers = qryParts.filter(q => !cachedQrysKeys.includes(q));
-        log(leftOvers);
-        const url = request.url.replace(qry, leftOvers.join(','));
+      if (cachedQrysKeys.length !== parts.length) {
+        leftOvers = parts.filter(q => !cachedQrysKeys.includes(q));
+        const url = request.url.replace(query, leftOvers.join(','));
         return fetchSaveAndMergeConversion(url, cachedQrys);
       }
     }
@@ -318,5 +345,12 @@ self.addEventListener('message', ({ data }) => {
   const { action } = data;
   if (action === 'SkipWaiting') {
     self.skipWaiting();
+  }
+});
+
+self.addEventListener('sync', (event) => {
+  if (event.tag == 'clear-outbox') {
+    log('handling', event.tag)
+    //event.waitUntil(doSomeStuff());
   }
 });

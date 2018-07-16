@@ -4,7 +4,7 @@ import {
   split,
   spaceDelimitter,
   queryCheckr,
-  logger,
+  // logger,
   srcToDestCurrencyDelimitter
 } from './utils.js';
 
@@ -14,11 +14,11 @@ let pBar;
 let srcResultEl;
 let destResultEl;
 
-const log = logger('App');
+// const log = logger('App');
 
 const unbundleConversion = conversion => {
   const keys = Object.keys(conversion);
-  return keys.reduce((pool, key) => {
+  return keys.filter(k => k.indexOf('_') !== -1).reduce((pool, key) => {
     const [from, to] = key.split(/_/);
     return [...pool, { from, to, key }];
   }, []);
@@ -31,13 +31,21 @@ const renderAConversion = (conversion, index, countries, amount) => {
     const { currencyName: destCurrencyName } = countries[to];
     const { currencyName: srcCurrencyName } = countries[from];
 
-    if (index === 0) {
-      srcResultEl.textContent = `${amount} ${srcCurrencyName.toLowerCase()}`;
-    }
-
-    const entry = document.createElement('li');
-    entry.textContent = `${figure} ${destCurrencyName.toLowerCase()}`;
-    destResultEl.appendChild(entry);
+    rAF().then(() => {
+      if (index === 0) {
+        srcResultEl.textContent = `${amount} ${srcCurrencyName.toLowerCase()}`;
+      }
+  
+      const entry = document.createElement('li');
+      const text = `${figure} ${destCurrencyName.toLowerCase()}`;
+  
+      entry.innerHTML = `<span class="left">${text}</span>`;
+      if(conversion.isUnwise === true) {
+        entry.classList.add('unwise');
+        entry.innerHTML = `<span class="badge left">recently</span> <span class="left">${text}</span>`;
+      }
+      destResultEl.appendChild(entry);
+    });
   });
 };
 
@@ -128,11 +136,11 @@ const handleAConversion = event => {
   // in parallel or in sequence?
   // Better if they are in parallel
   Promise.all(callConverterAPI(src, dest))
-    .then(responses => {
-      return responses
+    .then(responses =>
+      responses
         .filter(response => response && response.status === 200)
-        .map(response => response.json());
-    })
+        .map(response => response.json())
+    )
     .then(successfulResponses => {
       Promise.all(successfulResponses).then(conversions => {
         renderConversions(conversions, [src, ...dest], amount);

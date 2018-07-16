@@ -1,6 +1,6 @@
 import { logger } from './utils.js';
 
-const URIPrefix = '/convertr';
+const URIPrefix = '';
 const { info, err } = logger('App');
 const apiBase = 'https://free.currencyconverterapi.com/api/v5/convert';
 
@@ -67,8 +67,9 @@ const loadCountries = () =>
     .catch(error => err(error));
 
 const runApp = () => {
+  // TODO wrap in rIC
   registerServiceWorker()
-    .then(() => info('Registered Service Worker'))
+    .then(reg => info('Registered Service Worker'))
     .catch(error => err(error));
 };
 
