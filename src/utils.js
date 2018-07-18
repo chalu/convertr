@@ -3,6 +3,7 @@ const commaDelimitter = /\s*,\s*/;
 const srcToDestCurrencyDelimitter = /\s+>|to|in\s+/;
 const queryCheckr = /^(\d+\s+)?[a-zA-Z]{3}\s+>|to|in\s+[a-zA-Z]{3}(\s*,\s*[a-zA-Z]{3})*$/;
 
+const noopFn = () => {};
 const trim = (str = '') => str.trim();
 const split = (str = '', regExp = commaDelimitter) => str.split(regExp);
 
@@ -42,6 +43,7 @@ export {
   rAF,
   trim,
   split,
+  noopFn,
   logger,
   queryCheckr,
   spaceDelimitter,

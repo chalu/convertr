@@ -2,9 +2,9 @@ import {
   rAF,
   trim,
   split,
-  spaceDelimitter,
+  noopFn,
   queryCheckr,
-  // logger,
+  spaceDelimitter,
   srcToDestCurrencyDelimitter
 } from './utils.js';
 
@@ -13,8 +13,6 @@ import { loadCountries, callConverterAPI } from './io.js';
 let pBar;
 let srcResultEl;
 let destResultEl;
-
-// const log = logger('App');
 
 const unbundleConversion = conversion => {
   const keys = Object.keys(conversion);
@@ -37,7 +35,7 @@ const renderAConversion = (conversion, index, countries, amount) => {
       }
   
       const entry = document.createElement('li');
-      const text = `${figure} ${destCurrencyName.toLowerCase()}`;
+      let text = `${figure} ${destCurrencyName.toLowerCase()}`;
   
       entry.innerHTML = `<span class="left">${text}</span>`;
       if(conversion.isUnwise === true) {
@@ -54,28 +52,35 @@ const renderForTheseCountries = (countries, amount) => (conversion, index) =>
 
 const optimizeQueryingWith = (currencies, amount) =>
   loadCountries()
-    .then(({ results: countries } = {}) =>
-      currencies.reduce((countriesMapping, currency) => {
-        const found = Object.values(countries).find(
-          ({ currencyId, currencyName }) => {
-            if (currency === 'USD') {
-              return (
-                currencyId === currency &&
-                currencyName.startsWith('United States')
-              );
+    .then(({ results: countries } = {}) => {
+      if(currencies && countries) {
+        return currencies.reduce((countriesMapping, currency) => {
+          const found = Object.values(countries).find(
+            ({ currencyId, currencyName }) => {
+              if (currency === 'USD') {
+                return (
+                  currencyId === currency &&
+                  currencyName.startsWith('United States')
+                );
+              }
+              return currencyId === currency;
             }
-            return currencyId === currency;
-          }
-        );
+          );
+  
+          return found !== undefined
+            ? { ...countriesMapping, ...{ [found.currencyId]: found } }
+            : countriesMapping;
+        }, {})
+      }
+      return {};
+    })
+    .then(countriesMapping => {
+      // app is likely not properly initialised with needed data
+      // e.g it is offline and there's no cached data
+      if(Object.keys(countriesMapping).length === 0) return noopFn;
 
-        return found !== undefined
-          ? { ...countriesMapping, ...{ [found.currencyId]: found } }
-          : countriesMapping;
-      }, {})
-    )
-    .then(countriesMapping =>
-      renderForTheseCountries(countriesMapping, amount)
-    );
+      return renderForTheseCountries(countriesMapping, amount)
+    });
 
 const renderConversions = (conversions, currencies, amount = 1) => {
   srcResultEl = srcResultEl || document.querySelector('#src-result');

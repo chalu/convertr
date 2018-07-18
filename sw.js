@@ -3,7 +3,7 @@ importScripts('./node_modules/idb/lib/idb.js');
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
-const URIPrefix = '.';
+const URIPrefix = '/convertr/'; // OR just . for localhost
 
 // some utils
 const log = (...msgs) => {
@@ -24,12 +24,13 @@ const responseCanErr = response => {
 *************************** */
 
 // object store names
+const OUTBOX = 'outbox';
 const COUNTRIES = 'countries';
 const CONVERSIONS = 'conversions';
 
 // open/get connection to database
 const getDB = () =>
-  idb.open('convertr', 1, upgradeDb => {
+  idb.open('convertr', 2, upgradeDb => {
     const countriesStore = upgradeDb.createObjectStore(COUNTRIES, {
       keyPath: 'id'
     });
@@ -39,6 +40,11 @@ const getDB = () =>
       keyPath: 'key'
     });
     conversionsStore.createIndex('by-date', 'date');
+
+    const outboxStore = upgradeDb.createObjectStore(OUTBOX, {
+      keyPath: 'key'
+    });
+    outboxStore.createIndex('by-date', 'date');
   });
 
 const dbSaveCollection = (collection, store, db) =>
@@ -74,12 +80,27 @@ const dbGetConversions = () => {
   });
 };
 
-/* End IndexedDB onperations
-****************************** */
-
 // save currency conversions to DB
 const dbSaveConversions = conversions =>
   getDB().then(db => dbSaveCollection(conversions, CONVERSIONS, db));
+
+// save conversions to Outbox queue in DB
+const dbSaveToOutbox = conversions =>
+  getDB().then(db => dbSaveCollection(conversions, OUTBOX, db));
+
+// get conversions in Outbox queue
+const dbGetFromOutbox = () => {
+  return getDB().then(db => {
+    return db
+      .transaction(OUTBOX)
+      .objectStore(OUTBOX)
+      .index('by-date')
+      .getAll();
+  });
+};
+
+/* End IndexedDB onperations
+****************************** */
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -164,7 +185,12 @@ const getQueryParts = search => {
 };
 
 const queueConversionRequest = (parts) => {
-  log('queueConversionRequest', parts, self);
+  const now = Date.now();
+  const queue = parts.map(part => ({
+    key: part, date: now
+  }));
+  
+  dbSaveToOutbox(queue);
 };
 
 const respondFromHistoryOrDefaultToZeroThenQueue = ({url}) => {
@@ -181,7 +207,6 @@ const respondFromHistoryOrDefaultToZeroThenQueue = ({url}) => {
       return pool;
     }, {isUnwise: true});
 
-    // TODO queue a request for the conversion 
     queueConversionRequest(parts);
     return generateAResponse(unwiseConversions);
   });
@@ -340,6 +365,14 @@ const serveCountries = ({ request }) => {
   });
 };
 
+const handleOutboxQueue = () => {
+  // 1. are the items in the queue
+  // 2. if so, get them (their keys) and issue conversion requests
+  // 3. populate DB with the results
+  // 4. display a notification
+  return Promise.resolve();
+};
+
 // handle commands from the UI
 self.addEventListener('message', ({ data }) => {
   const { action } = data;
@@ -350,7 +383,6 @@ self.addEventListener('message', ({ data }) => {
 
 self.addEventListener('sync', (event) => {
   if (event.tag == 'clear-outbox') {
-    log('handling', event.tag)
-    //event.waitUntil(doSomeStuff());
+    event.waitUntil(handleOutboxQueue());
   }
 });
