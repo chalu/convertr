@@ -3,7 +3,7 @@ importScripts('./node_modules/idb/lib/idb.js');
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
-const URIPrefix = '/convertr/'; // OR just . for localhost
+const URIPrefix = '/convertr'; // OR just . for localhost
 
 // some utils
 const log = (...msgs) => {
@@ -30,7 +30,7 @@ const CONVERSIONS = 'conversions';
 
 // open/get connection to database
 const getDB = () =>
-  idb.open('convertr', 2, upgradeDb => {
+  idb.open('convertr', 1, upgradeDb => {
     const countriesStore = upgradeDb.createObjectStore(COUNTRIES, {
       keyPath: 'id'
     });
