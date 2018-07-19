@@ -4,11 +4,11 @@
   "theme_color": "#26a69a",
   "background_color": "#ffffff",
   "display": "standalone",
-  "Scope": "/",
-  "start_url": "/",
+  "Scope": "/convertr/",
+  "start_url": "/convertr/",
   "icons": [
     {
-      "src": "./statics/images/icons/icon-72x72.png",
+      "src": "statics/images/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
