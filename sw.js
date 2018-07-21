@@ -3,7 +3,10 @@ importScripts('./node_modules/idb/lib/idb.js');
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
-const URIPrefix = '/convertr'; // OR just . for localhost
+
+const local = '.';
+// const ghPages = '/convertr';
+const URIPrefix = local;
 
 // some utils
 const log = (...msgs) => {
@@ -50,7 +53,7 @@ const getDB = () =>
 const dbSaveCollection = (collection, store, db) =>
   collection.reduce((prevTnx, entry) => {
     const tnx = db.transaction(store, 'readwrite');
-    tnx.objectStore(store).add(entry);
+    tnx.objectStore(store).put(entry);
 
     return prevTnx.then(() => tnx.complete);
   }, Promise.resolve());
