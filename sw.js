@@ -1,7 +1,7 @@
 importScripts('./node_modules/idb/lib/idb.js');
 
 const appPrefix = 'convertr-';
-const staticCacheName = `${appPrefix}static-v1`;
+const staticCacheName = `${appPrefix}static-v2`;
 const allCaches = [staticCacheName];
 
 // const local = '.';
@@ -112,7 +112,6 @@ self.addEventListener('install', event => {
         `${URIPrefix}/`,
         `${URIPrefix}/index.html`,
         `${URIPrefix}/dist/main.js`,
-        `${URIPrefix}/src/index.js`,
         `${URIPrefix}/node_modules/idb/lib/idb.js`,
         `${URIPrefix}/statics/images/icons/icon-72x72.png`,
         `${URIPrefix}/statics/images/christine-roy-343235-unsplash.jpg`,

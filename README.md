@@ -29,7 +29,7 @@ amount? source currency to | in | > target curency [, target currenct]*
 * All conversion requests made when offline are queue-ed into an `OUTBOX`. (TODO - will use BackgroundSync to complete such requests and then notify the user)
 
 ## Feedback
-Feel very free to reach me on Twitter with @chaluwa or start and fork the repo. 
+Feel very free to reach me on Twitter with [@chaluwa](https://twitter.com/chaluwa) or start and fork the repo. 
 
 I really want to hear from you. I am open to ideas, suggestions and general feedback on this implementation of a currency converter and my usage of ServiceWorker in the app.
 
