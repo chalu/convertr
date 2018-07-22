@@ -1,8 +1,8 @@
 import { logger } from './utils.js';
 
-const local = '';
-// const ghPages = '/convertr';
-const URIPrefix = local;
+// const local = '';
+const ghPages = '/convertr';
+const URIPrefix = ghPages;
 const { info, err } = logger('App');
 const apiBase = 'https://free.currencyconverterapi.com/api/v5/convert';
 

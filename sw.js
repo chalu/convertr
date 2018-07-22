@@ -4,9 +4,9 @@ const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v1`;
 const allCaches = [staticCacheName];
 
-const local = '.';
-// const ghPages = '/convertr';
-const URIPrefix = local;
+// const local = '.';
+const ghPages = '/convertr';
+const URIPrefix = ghPages;
 
 // some utils
 const log = (...msgs) => {
