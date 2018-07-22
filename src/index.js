@@ -20,15 +20,13 @@ const handleOnline = () => {
   documentBody = documentBody || document.querySelector('body');
   documentBody.classList.remove('offline');
   if(wasJustOffline === true) {
-    M.Toast.dismissAll();
-    M.toast({ html: 'your connetion has been restored!' });
+    // your connetion has been restored!
     wasJustOffline = false;
   }
 };
 
 const notifyOffline = () => {
-  M.Toast.dismissAll();
-  M.toast({ html: 'you no longer have connetion!' });
+  // you no longer have connection!
 };
 
 const handleOffline = () => {
@@ -39,7 +37,6 @@ const handleOffline = () => {
 };
 
 const initConverter = () => {
-  M.FormSelect.init(document.querySelectorAll('select'));
 
   document
     .querySelector('#omnibox')
@@ -48,7 +45,7 @@ const initConverter = () => {
     // calls to handleAConversion
     .addEventListener('keyup', handleAConversion);
 
-  document.querySelector('#mode-switch').addEventListener('click', switchUI);
+  document.querySelector('#go-convert').addEventListener('click', handleAConversion);
 
   document.querySelector('#offline').addEventListener('click', notifyOffline);
 

@@ -11,6 +11,7 @@ import {
 import { loadCountries, callConverterAPI } from './io.js';
 
 let pBar;
+let omnibox;
 let srcResultEl;
 let destResultEl;
 
@@ -40,7 +41,7 @@ const renderAConversion = (conversion, index, countries, amount) => {
       entry.innerHTML = `<span class="left">${text}</span>`;
       if(conversion.isUnwise === true) {
         entry.classList.add('unwise');
-        entry.innerHTML = `<span class="badge left">recently</span> <span class="left">${text}</span>`;
+        entry.innerHTML = `<span class="timeago">recently</span> <span class="conversion">${text}</span>`;
       }
       destResultEl.appendChild(entry);
     });
@@ -86,6 +87,10 @@ const renderConversions = (conversions, currencies, amount = 1) => {
   srcResultEl = srcResultEl || document.querySelector('#src-result');
   destResultEl = destResultEl || document.querySelector('#dest-result');
 
+  // cater for malicious / un-serious
+  // entries like zeros or negative numbers
+  if (amount < 1) amount = 1;
+
   const rendererResolver = optimizeQueryingWith(currencies, amount);
   rendererResolver.then(renderer => {
     destResultEl.innerHTML = '';
@@ -111,21 +116,34 @@ const doneConverting = () => {
 };
 
 const handleAConversion = event => {
-  const {
+  let {
     keyCode,
     target: { value }
   } = event;
-  if (keyCode !== 13) return;
 
-  // clean and validate query on enter key
+  // was the enter key used instead
+  if (keyCode && keyCode !== 13) return;
+
+  omnibox = omnibox || document.querySelector('#omnibox');
+  omnibox.classList.remove('invalid');
+
+  // was the button clicked instead
+  if(!keyCode) {
+    value = omnibox.value;
+  }
+
+  // clean and validate query before proceeding
   const entry = trim(value);
-  if (queryCheckr.test(entry) === false) return;
+  if (queryCheckr.test(entry) === false) {
+    omnibox.classList.add('invalid');
+    return;
+  };
 
   const [from, to] = split(entry, srcToDestCurrencyDelimitter);
-  const dest = split(to)
+  let dest = split(to)
     .filter(item => item !== '')
-    .map(item => trim(item));
-  const unpackedFrom = trim(from).split(spaceDelimitter);
+    .map(item => trim(item).toUpperCase());
+  const unpackedFrom = trim(from).toUpperCase().split(spaceDelimitter);
 
   let src;
   let amount;
@@ -135,7 +153,16 @@ const handleAConversion = event => {
     [amount, src] = unpackedFrom;
   }
 
+  // disallow trying to convert
+  // between the exact same currency
+  dest = dest.filter(d => d !== src);
+  if(dest.length === 0) {
+    omnibox.classList.add('invalid');
+    return;
+  }
+
   beginConverting();
+  
   // TODO
   // Are we making these API calls
   // in parallel or in sequence?
