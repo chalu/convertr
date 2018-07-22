@@ -7,7 +7,7 @@ const { info, err } = logger('App');
 const apiBase = 'https://free.currencyconverterapi.com/api/v5/convert';
 
 const swUpdateReady = worker => {
-  M.toast({ html: 'Updating to the latest and greatest version ...' });
+  // 'Updating to the latest and greatest version ...'
   worker.postMessage({ action: 'skipWaiting' });
   return worker;
 };
@@ -69,10 +69,11 @@ const loadCountries = () =>
     .catch(error => err(error));
 
 const runApp = () => {
-  // TODO wrap in rIC
   registerServiceWorker()
-    .then(() => info('Registered Service Worker'))
-    .catch(error => err(error));
+  .then(() => {
+    info('Registered Service Worker');
+  })
+  .catch(error => err(error));
 };
 
 export { callConverterAPI, loadCountries, runApp };

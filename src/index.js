@@ -1,32 +1,23 @@
 import { runApp } from './io.js';
+import { noopFn, notifyr } from './utils.js';
+
 import handleAConversion from './conversion.js';
 
 let documentBody;
-let switchables;
+let notify = noopFn;
 let wasJustOffline = false;
-
-const switchUI = () => {
-  switchables = switchables || document.querySelectorAll('.layer.switchable');
-  Array.from(switchables).forEach(layer => {
-    if (layer.classList.contains('expanded')) {
-      layer.classList.remove('expanded');
-    } else {
-      layer.classList.add('expanded');
-    }
-  });
-};
 
 const handleOnline = () => {
   documentBody = documentBody || document.querySelector('body');
   documentBody.classList.remove('offline');
   if(wasJustOffline === true) {
-    // your connetion has been restored!
+    notify('your connetion has been restored!');
     wasJustOffline = false;
   }
 };
 
 const notifyOffline = () => {
-  // you no longer have connection!
+  notify('you no longer have connection!');
 };
 
 const handleOffline = () => {
@@ -34,6 +25,16 @@ const handleOffline = () => {
   documentBody.classList.add('offline');
   wasJustOffline = true;
   notifyOffline();
+};
+
+const preLaunch = () => {
+  if(! window || !"Notification" in window) return;
+
+  if(Notification.permission !== 'denied') {
+    Notification.requestPermission(status => {
+      if(status === 'granted') notify = notifyr;
+    });
+  }
 };
 
 const initConverter = () => {
@@ -56,6 +57,7 @@ const initConverter = () => {
     handleOffline();
   }
 
+  preLaunch();
   runApp();
 };
 document.addEventListener('DOMContentLoaded', initConverter);

@@ -114,10 +114,9 @@ self.addEventListener('install', event => {
         `${URIPrefix}/dist/main.js`,
         `${URIPrefix}/src/index.js`,
         `${URIPrefix}/node_modules/idb/lib/idb.js`,
-        `${URIPrefix}/statics/images/optimized/didier-weemaels-36055-unsplash.jpg`,
-        `${URIPrefix}/statics/images/optimized/didier-weemaels-36055-unsplash-grey.jpg`,
-        `${URIPrefix}/node_modules/materialize-css/dist/css/materialize.min.css`,
-        `${URIPrefix}/node_modules/materialize-css/dist/js/materialize.min.js`
+        `${URIPrefix}/statics/images/icons/icon-72x72.png`,
+        `${URIPrefix}/statics/images/christine-roy-343235-unsplash.jpg`,
+        `${URIPrefix}/statics/images/christine-roy-343235-unsplash-off.jpg`
       ]);
     })
   );

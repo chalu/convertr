@@ -4,6 +4,11 @@ const srcToDestCurrencyDelimitter = /\s+>|to|in\s+/;
 const queryCheckr = /^(\d+\s+)?[a-zA-Z]{3}\s+>|to|in\s+[a-zA-Z]{3}(\s*,\s*[a-zA-Z]{3})*$/i;
 
 const noopFn = () => {};
+
+const notifyr = (msg) => new Notification('Convertr', {
+  body: msg, icon: '../statics/images/icons/icon-72x72.png'
+});
+
 const trim = (str = '') => str.trim();
 const split = (str = '', regExp = commaDelimitter) => str.split(regExp);
 
@@ -45,6 +50,7 @@ export {
   split,
   noopFn,
   logger,
+  notifyr,
   queryCheckr,
   spaceDelimitter,
   commaDelimitter,

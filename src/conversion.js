@@ -34,12 +34,12 @@ const renderAConversion = (conversion, index, countries, amount) => {
       if (index === 0) {
         srcResultEl.textContent = `${amount} ${srcCurrencyName.toLowerCase()}`;
       }
-  
+
       const entry = document.createElement('li');
       let text = `${figure} ${destCurrencyName.toLowerCase()}`;
-  
+
       entry.innerHTML = `<span class="left">${text}</span>`;
-      if(conversion.isUnwise === true) {
+      if (conversion.isUnwise === true) {
         entry.classList.add('unwise');
         entry.innerHTML = `<span class="timeago">recently</span> <span class="conversion">${text}</span>`;
       }
@@ -54,7 +54,7 @@ const renderForTheseCountries = (countries, amount) => (conversion, index) =>
 const optimizeQueryingWith = (currencies, amount) =>
   loadCountries()
     .then(({ results: countries } = {}) => {
-      if(currencies && countries) {
+      if (currencies && countries) {
         return currencies.reduce((countriesMapping, currency) => {
           const found = Object.values(countries).find(
             ({ currencyId, currencyName }) => {
@@ -67,20 +67,20 @@ const optimizeQueryingWith = (currencies, amount) =>
               return currencyId === currency;
             }
           );
-  
+
           return found !== undefined
             ? { ...countriesMapping, ...{ [found.currencyId]: found } }
             : countriesMapping;
-        }, {})
+        }, {});
       }
       return {};
     })
     .then(countriesMapping => {
       // app is likely not properly initialised with needed data
       // e.g it is offline and there's no cached data
-      if(Object.keys(countriesMapping).length === 0) return noopFn;
+      if (Object.keys(countriesMapping).length === 0) return noopFn;
 
-      return renderForTheseCountries(countriesMapping, amount)
+      return renderForTheseCountries(countriesMapping, amount);
     });
 
 const renderConversions = (conversions, currencies, amount = 1) => {
@@ -93,14 +93,15 @@ const renderConversions = (conversions, currencies, amount = 1) => {
 
   const rendererResolver = optimizeQueryingWith(currencies, amount);
   rendererResolver.then(renderer => {
-    destResultEl.innerHTML = '';
-    srcResultEl.innerHTML = '';
+    rAF().then(() => {
+      destResultEl.innerHTML = '';
+      srcResultEl.innerHTML = '';
 
-    const resultsEl = document.querySelector('#converter-result-wrap');
-    if (!resultsEl.classList.contains('has-results')) {
-      resultsEl.classList.add('has-results');
-    }
-
+      const resultsEl = document.querySelector('#converter-result-wrap');
+      if (!resultsEl.classList.contains('has-results')) {
+        resultsEl.classList.add('has-results');
+      }
+    });
     conversions.forEach(renderer);
   });
 };
@@ -125,25 +126,28 @@ const handleAConversion = event => {
   if (keyCode && keyCode !== 13) return;
 
   omnibox = omnibox || document.querySelector('#omnibox');
-  omnibox.classList.remove('invalid');
+  rAF().then(() => omnibox.classList.remove('invalid'));
 
   // was the button clicked instead
-  if(!keyCode) {
+  if (!keyCode) {
     value = omnibox.value;
   }
 
   // clean and validate query before proceeding
   const entry = trim(value);
   if (queryCheckr.test(entry) === false) {
-    omnibox.classList.add('invalid');
+    rAF().then(() => omnibox.classList.add('invalid'));
     return;
-  };
+  }
 
   const [from, to] = split(entry, srcToDestCurrencyDelimitter);
   let dest = split(to)
     .filter(item => item !== '')
     .map(item => trim(item).toUpperCase());
-  const unpackedFrom = trim(from).toUpperCase().split(spaceDelimitter);
+
+  const unpackedFrom = trim(from)
+    .toUpperCase()
+    .split(spaceDelimitter);
 
   let src;
   let amount;
@@ -155,14 +159,15 @@ const handleAConversion = event => {
 
   // disallow trying to convert
   // between the exact same currency
+  // e.g USD to USD
   dest = dest.filter(d => d !== src);
-  if(dest.length === 0) {
-    omnibox.classList.add('invalid');
+  if (dest.length === 0) {
+    rAF().then(() => omnibox.classList.add('invalid'));
     return;
   }
 
   beginConverting();
-  
+
   // TODO
   // Are we making these API calls
   // in parallel or in sequence?
