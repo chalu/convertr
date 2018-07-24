@@ -279,7 +279,7 @@
 
     @media (max-width: 550px) {
       .app {
-        background-image: url('./statics/images/christine-roy-343235-unsplash.jpg');
+        background-image: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%), url('./statics/images/christine-roy-343235-unsplash.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         -webkit-transition: background-image 3s ease-in-out;
@@ -287,7 +287,7 @@
       }
 
       body.offline .app {
-        background-image: url('./statics/images/christine-roy-343235-unsplash-off.jpg');
+        background-image: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%), url('./statics/images/christine-roy-343235-unsplash-off.jpg');
       }
 
       .app header .title {
@@ -313,6 +313,12 @@
         background: var(--black);
         text-transform: capitalize;
         align-self: flex-end;
+      }
+    }
+
+    @media (max-width: 385px) {
+      main .inputs {
+        border-radius: 0;
       }
     }
   </style>
