@@ -1,7 +1,7 @@
 importScripts('./node_modules/idb/lib/idb.js');
 
 const appPrefix = 'convertr-';
-const staticCacheName = `${appPrefix}static-v2`;
+const staticCacheName = `${appPrefix}static-v2.5`;
 const allCaches = [staticCacheName];
 
 // const local = '.';
