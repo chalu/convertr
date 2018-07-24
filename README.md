@@ -22,16 +22,15 @@ amount? source currency to | in | > target curency [, target currenct]*
 * Uses the free version of `https://free.currencyconverterapi.com` API to convert between currencies
 * Though free usage of the API has a limit of 2 conversions per API call (e.g USD -> NGN and USD to ZAR), this app allows you do more conversions at a go
 * Works offline with a smart ServiceWorker :D
-* Conversions occur once per day, thus subsequent conversion for USD -> ZAR after then first one will return same result for that day. (TODO - make this configurable)
-* Simple querying. `USD to ZAR, KES, NGN, PHP` will convert all from 1 United States Dollar to all the currencies appearing after `to`. You can also use `in` or `>` in place of `to`
+* Conversions requests via API calls occur once per day, thus subsequent conversion for USD -> ZAR after the first one will return same result for that day. (TODO - make this configurable)
+* Simple querying. `USD to ZAR, KES, NGN, PHP` will convert from 1 United States Dollar to all the currencies appearing after `to`. You can also use `in` or `>` in place of `to` in the query
 * Smart and optimized querying. Within the same day or anytime before, if you have converted `USD to KES, NGN` and then now request `USD to ZAR, KES, NGN, PHP`, the `USD -> KES` and `USD -> NGN` in this new request will be loaded from cache
 * Even if offline, the user will at least see results of previous conversions intead of an offline dinosour, a blank screen, or a less useful message saying there's no connection :D
 * All conversion requests made when offline are queue-ed into an `OUTBOX`. (TODO - will use BackgroundSync to complete such requests and then notify the user)
 
 ## Feedback
-Feel very free to reach me on Twitter with [@chaluwa](https://twitter.com/chaluwa) or start and fork the repo. 
+Feel very free to reach me on Twitter with [@chaluwa](https://twitter.com/chaluwa) or star and fork the repo. 
 
 I really want to hear from you. I am open to ideas, suggestions and general feedback on this implementation of a currency converter and my usage of ServiceWorker in the app.
 
 And yes, PRs are welcome!
-

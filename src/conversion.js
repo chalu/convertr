@@ -38,8 +38,10 @@ const renderAConversion = (conversion, index, countries, amount) => {
       const entry = document.createElement('li');
       let text = `${figure} ${destCurrencyName.toLowerCase()}`;
 
-      entry.innerHTML = `<span class="left">${text}</span>`;
+      entry.innerHTML = `<span>${text}</span>`;
       if (conversion.isUnwise === true) {
+        // we are offline and pulled this
+        // record that was cached much earlier in time
         entry.classList.add('unwise');
         entry.innerHTML = `<span class="timeago">recently</span> <span class="conversion">${text}</span>`;
       }

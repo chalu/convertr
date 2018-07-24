@@ -152,7 +152,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // API call to convert between two or more curencies
+  // API call to convert between curencies
   if (requestUrl.pathname.includes('/api/v5/convert')) {
     event.respondWith(serveConversion(event, requestUrl.search));
     return;
@@ -231,7 +231,7 @@ const fetchAndSaveConversion = request => {
     .then(networkResponse => {
       const clone = networkResponse.clone();
       // TODO make this flow asynchronous
-      // let net wait to complete the DB operation before
+      // lets not wait to complete the DB operation before
       // responding for this request
       clone.json().then(data => {
         const now = Date.now();
@@ -271,8 +271,7 @@ const getCachedConversionQueries = ({ parts, conversions, dateKey }) => {
 };
 
 // the user wants to convert between currencies
-// already converted and cached today and some
-// for the first time
+// already cached today and some for the first time
 const fetchSaveAndMergeConversion = (url, cached) => {
   return fetchAndSaveConversion(url)
     .then(response => response.json())
@@ -367,9 +366,9 @@ const serveCountries = ({ request }) => {
 };
 
 const handleOutboxQueue = () => {
-  // 1. are the items in the queue
+  // 1. are there items in the queue
   // 2. if so, get them (their keys) and issue conversion requests
-  // 3. populate DB with the results
+  // 3. populate DB with the results and clear queue in DB
   // 4. display a notification
   return Promise.resolve();
 };
