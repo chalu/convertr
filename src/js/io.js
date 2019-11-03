@@ -1,10 +1,15 @@
 import { logger } from './utils.js';
+import dotenv from 'dotenv';
 
-// const local = '';
-const ghPages = '/convertr';
-const URIPrefix = ghPages;
+dotenv.config();
+
+const local = '';
+// const ghPages = '/convertr';
+const URIPrefix = local;
 const { info, err } = logger('App');
-const apiBase = 'https://free.currencyconverterapi.com/api/v5/convert';
+
+const apiKey = `apiKey=${process.env.apiKey}`;
+const apiBase = 'https://free.currconv.com/api/v7';
 
 const swUpdateReady = worker => {
   // 'Updating to the latest and greatest version ...'
@@ -52,28 +57,28 @@ const callConverterAPI = (
   if (!firstTo) return calls;
 
   if (firstTo && !secondTo) {
-    return [...calls, fetch(`${apiBase}?q=${from}_${firstTo}&compact=ultra`)];
+    return [...calls, fetch(`${apiBase}/convert?q=${from}_${firstTo}&compact=ultra&${apiKey}`)];
   }
 
   calls = [
     ...calls,
-    fetch(`${apiBase}?q=${from}_${firstTo},${from}_${secondTo}&compact=ultra`)
+    fetch(`${apiBase}/convert?q=${from}_${firstTo},${from}_${secondTo}&compact=ultra&${apiKey}`)
   ];
 
   return callConverterAPI(from, moreTos, calls);
 };
 
 const loadCountries = () =>
-  fetch('https://free.currencyconverterapi.com/api/v5/countries')
+  fetch(`${apiBase}/countries?${apiKey}`)
     .then(response => response.json())
     .catch(error => err(error));
 
 const runApp = () => {
-  registerServiceWorker()
-  .then(() => {
-    info('Registered Service Worker');
-  })
-  .catch(error => err(error));
+  // registerServiceWorker()
+  // .then(() => {
+  //   info('Registered Service Worker');
+  // })
+  // .catch(error => err(error));
 };
 
 export { callConverterAPI, loadCountries, runApp };

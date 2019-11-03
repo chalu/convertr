@@ -1,0 +1,303 @@
+:root {
+    --green: #26a69a;
+    --yellow: #ffc600;
+    --black: #272727;
+    --white: #fafafa;
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    color: var(--black);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.07);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  }
+
+  .viewport {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr);
+  }
+
+  .app {
+    background: #fff;
+    display: grid;
+    grid-template-rows: 65px 1fr 65px;
+  }
+
+  .app input:focus,
+  .app button:focus {
+    outline: none;
+  }
+
+  .app header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .app header .title {
+    margin-left: 32px;
+    color: var(--black);
+    font-size: 2rem;
+    line-height: 110%;
+    font-weight: 400;
+  }
+
+  .app header .tbar {
+    display: grid;
+    justify-items: end;
+  }
+
+  header .tbar button {
+    margin-right: 36px;
+    border: none;
+    background: var(--white);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: border 2s ease-in;
+  }
+
+  header .tbar button:hover {
+    border: 1px solid var(--black);
+    background: var(--white);
+  }
+
+  #offline {
+    opacity: 0;
+    transition: opacity 1.5s ease-in;
+  }
+
+  body.offline #offline {
+    opacity: 1;
+  }
+
+  main {
+    display: grid;
+    grid-template-rows: 1fr 1fr 2fr;
+    justify-items: center;
+  }
+
+  main .inputs {
+    align-self: flex-end;
+    padding: 5px 20px;
+    min-width: 80%;
+    border-radius: 10px;
+  }
+
+  main .inputs .input-field {
+    position: relative;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  main .omnibox-wrap {
+    width: 100%;
+  }
+
+  main .omnibox-wrap input {
+    width: 100%;
+    max-width: 900px;
+    border: 0;
+    padding: 10px 5px;
+    font-size: xx-large;
+    color: var(--green);
+    text-align: center;
+    background: transparent;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--green);
+  }
+
+  main .omnibox-wrap input:placeholder-shown {
+    text-transform: lowercase;
+    color: grey;
+    font-style: italic;
+    text-align: center;
+  }
+
+  main .omnibox-wrap input.invalid {
+    border-bottom: 2px dotted red;
+  }
+
+  main .controls {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+    align-self: flex-start;
+    justify-items: center;
+  }
+
+  main .controls button {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    border: none;
+    border-radius: 5px;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 16px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #fff;
+    background-color: var(--green);
+    text-align: center;
+    letter-spacing: .5px;
+    -webkit-transition: background-color .2s ease-out;
+    transition: background-color .2s ease-out;
+    cursor: pointer;
+    -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  main .controls button:hover {
+    background-color: #2bbbad;
+    -webkit-box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  #converter-result-wrap {
+    align-self: flex-start;
+    padding: 10px 20px;
+    min-width: 80%;
+    border-radius: 10px;
+    color: var(--black);
+    background: var(--yellow);
+    transition: opacity 3s ease-in;
+    display: none;
+    opacity: 0;
+  }
+
+  #converter-result-wrap.has-results {
+    display: block;
+    opacity: .85;
+  }
+
+  #src-result {
+    font-size: 1.35em;
+    text-transform: capitalize;
+  }
+
+  #dest-result {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  #dest-result li {
+    display: grid;
+    margin: 10px 5px;
+    font-size: 1.35em;
+    text-transform: capitalize;
+  }
+
+  #dest-result li .timeago {
+    font-size: 60%;
+  }
+
+  #dest-result li.unwise .conversion {
+    display: grid;
+  }
+
+  footer {
+    display: grid;
+    justify-items: end;
+  }
+
+  footer .credit-photo {
+    display: none;
+  }
+
+  .preloader-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    position: absolute;
+    left: calc(50% - 32px);
+    top: calc(50% - 32px);
+    opacity: 0;
+    display: none;
+    justify-items: center;
+    align-items: center;
+    transition: opacity 3s ease-in;
+  }
+
+  .preloader-wrapper.active {
+    display: grid;
+    opacity: 1;
+  }
+
+  .preloader-wrapper.active svg {
+    width: 48px;
+    height: 48px;
+    fill: var(--yellow);
+  }
+
+  .rotate {
+    -webkit-animation: rotate 1.5s linear infinite;
+    animation: rotate 1.5s linear infinite;
+  }
+
+  @-webkit-keyframes rotate {
+    to {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 550px) {
+    .app {
+      background-image: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%), url('../images/christine-roy-343235-unsplash.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      -webkit-transition: background-image 3s ease-in-out;
+      transition: background-image 3s ease-in-out;
+    }
+
+    body.offline .app {
+      background-image: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%), url('../images/christine-roy-343235-unsplash-off.jpg');
+    }
+
+    .app header .title {
+      color: var(--white);
+    }
+
+    main .controls button {
+      color: var(--white);
+      background-color: var(--black);
+    }
+
+    main .inputs {
+      opacity: .8;
+      background: var(--white);
+    }
+
+    footer .credit-photo {
+      display: inline-block;
+      padding: 8px;
+      opacity: .7;
+      margin-right: 30px;
+      color: var(--yellow);
+      background: var(--black);
+      text-transform: capitalize;
+      align-self: flex-end;
+    }
+  }
+
+  @media (max-width: 385px) {
+    main .inputs {
+      border-radius: 0;
+    }
+  }

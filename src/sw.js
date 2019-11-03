@@ -1,12 +1,13 @@
-importScripts('./node_modules/idb/lib/idb.js');
+// importScripts('./node_modules/idb/lib/idb.js');
+importScripts('https://unpkg.com/idb?module');
 
 const appPrefix = 'convertr-';
 const staticCacheName = `${appPrefix}static-v2.5`;
 const allCaches = [staticCacheName];
 
-// const local = '.';
-const ghPages = '/convertr';
-const URIPrefix = ghPages;
+const local = '.';
+// const ghPages = '/convertr';
+const URIPrefix = local;
 
 // some utils
 const log = (...msgs) => {

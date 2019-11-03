@@ -43,6 +43,8 @@ typings/
 # Optional npm cache directory
 .npm
 
+node_modules/
+
 # Optional eslint cache
 .eslintcache
 
@@ -60,3 +62,10 @@ typings/
 
 # next.js build output
 .next
+
+# parcel
+.cache/
+dev-build
+
+#vscode
+.vscode
