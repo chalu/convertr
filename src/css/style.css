@@ -72,6 +72,7 @@
   }
 
   #offline {
+    /* TODO: disable UI interactions */
     opacity: 0;
     transition: opacity 1.5s ease-in;
   }

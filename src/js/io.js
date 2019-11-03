@@ -26,28 +26,12 @@ const trackSwInstallation = worker => {
   return worker;
 };
 
-const registerServiceWorker = () =>
-  new Promise(resolve => {
-    if (!navigator.serviceWorker) resolve();
+const registerServiceWorker = async () => {
+  if (!navigator.serviceWorker) return;
 
-    navigator.serviceWorker
-      .register(`${URIPrefix}/sw.js`, { scope: `${URIPrefix}/` })
-      .then(reg => {
-        if (reg.waiting) {
-          resolve(swUpdateReady(reg.waiting));
-          return;
-        }
-
-        if (reg.installing) {
-          resolve(trackSwInstallation(reg.installing));
-          return;
-        }
-
-        reg.addEventListener('updatefound', () =>
-          trackSwInstallation(reg.installing)
-        );
-      });
-  });
+    await navigator.serviceWorker
+      .register(`${URIPrefix}/sw.js`, { scope: `${URIPrefix}/` });
+};
 
 const callConverterAPI = (
   from,
@@ -73,12 +57,13 @@ const loadCountries = () =>
     .then(response => response.json())
     .catch(error => err(error));
 
-const runApp = () => {
-  // registerServiceWorker()
-  // .then(() => {
-  //   info('Registered Service Worker');
-  // })
-  // .catch(error => err(error));
+const runApp = async () => {
+  try {
+    await registerServiceWorker();
+    info('Registered Service Worker');
+  } catch (error) {
+    err(error.message);
+  }
 };
 
 export { callConverterAPI, loadCountries, runApp };
