@@ -6,7 +6,7 @@ const queryCheckr = /^(\d+\s+)?[a-zA-Z]{3}\s+>|to|in\s+[a-zA-Z]{3}(\s*,\s*[a-zA-
 const noopFn = () => {};
 
 const notifyr = (msg) => new Notification('Convertr', {
-  body: msg, icon: '../images/icons/icon-72x72.png'
+  body: msg
 });
 
 const trim = (str = '') => str.trim();

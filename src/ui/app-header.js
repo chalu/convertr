@@ -1,10 +1,26 @@
 import { LitElement, html, css } from 'lit-element';
-import { notifyr as notify } from '../js/utils.js';
+import { connect } from 'pwa-helpers';
 
-class AppHeader extends LitElement {
+import { store } from '../state/store.js';
+import { notifyr as notify } from '../js/utils.js';
+import { connectionChanged } from '../state/actions.js';
+
+class AppHeader extends connect(store)(LitElement) {
 
     constructor() {
         super();
+        this.networkChanged = this.networkChanged.bind(this);
+    }
+
+    stateChanged(state) {
+        const { connection, showConnectionNotification } = state;
+        this.offline = connection === 'offline' ? true : false;
+
+        if (connection === 'offline' && showConnectionNotification) {
+            notify('you no longer have connection!');
+        } else if (connection === 'online' && showConnectionNotification) {
+            notify('your connection is restored!');
+        }
     }
 
     static get styles() {
@@ -107,7 +123,7 @@ class AppHeader extends LitElement {
         }
 
         if (navigator.onLine !== undefined && navigator.onLine === false) {
-            this.networkChanged({type: 'offline'});
+            this.networkChanged({type: 'offline'}, false);
         }
     }
 
@@ -117,14 +133,8 @@ class AppHeader extends LitElement {
         window.removeEventListener('offline', this.networkChanged);
     }
 
-    networkChanged({ type }) {
-        if (type === 'offline') {
-            this.offline = true;
-            notify('you no longer have connection!');
-        } else {
-            this.offline = false;
-            notify('your connetion has been restored!');
-        }
+    networkChanged({ type: status }, showNotification = true) {
+        store.dispatch(connectionChanged(status, showNotification));
     }
 
 }
