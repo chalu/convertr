@@ -1,0 +1,32 @@
+import { LitElement, html, css } from 'lit-element';
+
+class ConverterResult extends LitElement {
+    constructor() {
+        super();
+    }
+
+    static get styles() {
+        return css`
+            :host {
+                flex-grow: 1;
+            }
+        `;
+    }
+
+    render() {
+        return html`
+            <div data-result-wrap>
+                <p id="src-result"></p>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="#000000">
+                        <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
+                        <path d="M0 0h24v24H0z" fill="none" />
+                    </svg>
+                </div>
+                <ul id="dest-result"></ul>
+            </div>
+        `;
+    }
+}
+
+customElements.define('converter-result', ConverterResult);
