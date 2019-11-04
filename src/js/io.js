@@ -58,12 +58,12 @@ const loadCountries = () =>
     .catch(error => err(error));
 
 const runApp = async () => {
-  try {
-    await registerServiceWorker();
-    info('Registered Service Worker');
-  } catch (error) {
-    err(error.message);
-  }
+  // try {
+  //   await registerServiceWorker();
+  //   info('Registered Service Worker');
+  // } catch (error) {
+  //   err(error.message);
+  // }
 };
 
 export { callConverterAPI, loadCountries, runApp };

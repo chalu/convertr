@@ -21,8 +21,8 @@
 
   .viewport {
     height: 100vh;
-    display: grid;
-    grid-template-columns: minmax(320px, 1fr);
+    display: flex;
+    flex-flow: column;
   }
 
   .app {

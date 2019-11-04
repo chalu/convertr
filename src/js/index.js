@@ -48,16 +48,16 @@ const initConverter = () => {
 
   document.querySelector('#go-convert').addEventListener('click', handleAConversion);
 
-  document.querySelector('#offline').addEventListener('click', notifyOffline);
+  // document.querySelector('#offline').addEventListener('click', notifyOffline);
 
-  window.addEventListener('online', handleOnline);
-  window.addEventListener('offline', handleOffline);
+  // window.addEventListener('online', handleOnline);
+  // window.addEventListener('offline', handleOffline);
 
-  if (navigator.onLine !== undefined && navigator.onLine === false) {
-    handleOffline();
-  }
+  // if (navigator.onLine !== undefined && navigator.onLine === false) {
+  //   handleOffline();
+  // }
 
-  preLaunch();
+  // preLaunch();
   runApp();
 };
 document.addEventListener('DOMContentLoaded', initConverter);
