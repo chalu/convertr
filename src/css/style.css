@@ -25,60 +25,9 @@
     flex-flow: column;
   }
 
-  .app {
-    background: #fff;
-    display: grid;
-    grid-template-rows: 65px 1fr 65px;
-  }
-
   .app input:focus,
   .app button:focus {
     outline: none;
-  }
-
-  .app header {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-  }
-
-  .app header .title {
-    margin-left: 32px;
-    color: var(--black);
-    font-size: 2rem;
-    line-height: 110%;
-    font-weight: 400;
-  }
-
-  .app header .tbar {
-    display: grid;
-    justify-items: end;
-  }
-
-  header .tbar button {
-    margin-right: 36px;
-    border: none;
-    background: var(--white);
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    cursor: pointer;
-    transition: border 2s ease-in;
-  }
-
-  header .tbar button:hover {
-    border: 1px solid var(--black);
-    background: var(--white);
-  }
-
-  #offline {
-    /* TODO: disable UI interactions */
-    opacity: 0;
-    transition: opacity 1.5s ease-in;
-  }
-
-  body.offline #offline {
-    opacity: 1;
   }
 
   main {
